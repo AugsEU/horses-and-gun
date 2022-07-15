@@ -9,6 +9,8 @@ namespace HorsesAndGun
 {
     public class Game1 : Game
     {
+        public static Rectangle sRenderTargetRect;
+
         private const double FRAME_RATE = 60d;
         private const int MIN_HEIGHT = Screen.SCREEN_HEIGHT;
         private const int MIN_WIDTH = Screen.SCREEN_WIDTH;
@@ -121,7 +123,13 @@ namespace HorsesAndGun
 
             Rectangle destRect = new Rectangle((screenRect.Width - finalWidth) / 2, (screenRect.Height - finalHeight) / 2, finalWidth, finalHeight);
 
+            sRenderTargetRect.Location = destRect.Location;
+            sRenderTargetRect.Width = multiplier;
+            sRenderTargetRect.Height = multiplier;
+
             info.spriteBatch.Draw(screen, destRect, Color.White);
         }
+
+
     }
 }

@@ -74,7 +74,12 @@ namespace HorsesAndGun
 
         public Point GetMousePos()
         {
-            return mMouseState.Position;
+            Point screenPoint;
+
+            screenPoint.X = (mMouseState.Position.X - Game1.sRenderTargetRect.Location.X) / Game1.sRenderTargetRect.Width;
+            screenPoint.Y = (mMouseState.Position.Y - Game1.sRenderTargetRect.Location.Y) / Game1.sRenderTargetRect.Height;
+
+            return screenPoint;
         }
     }
 }
