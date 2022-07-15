@@ -86,7 +86,7 @@ namespace HorsesAndGun
         {
             Keys[] nextKeys = { Keys.Enter, Keys.Space };
 
-            if (InputManager.I.AnyKeysPressed(nextKeys))
+            if (InputManager.I.AnyKeysPressed(nextKeys) || InputManager.I.LClick())
             {
                 ScreenManager.I.ActivateScreen(ScreenType.MainMenu);
             }

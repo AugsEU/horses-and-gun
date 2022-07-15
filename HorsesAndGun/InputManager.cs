@@ -12,11 +12,17 @@ namespace HorsesAndGun
         KeyboardState mCurrentKeyState;
         KeyboardState mPreviousKeyState;
 
+        MouseState mPrevMouseState;
+        MouseState mMouseState;
+
         public void Update(GameTime gameTime)
         {
             mPreviousKeyState = mCurrentKeyState;
 
             mCurrentKeyState = Keyboard.GetState();
+
+            mPrevMouseState = mMouseState;
+            mMouseState = Mouse.GetState();
         }
 
         public bool AllKeysPressed(Keys[] keys)
@@ -48,6 +54,27 @@ namespace HorsesAndGun
         public bool KeyPressed(Keys key)
         {
             return mCurrentKeyState.IsKeyDown(key) && !mPreviousKeyState.IsKeyDown(key);
+        }
+
+        public bool LClick()
+        {
+            bool nowPress = mMouseState.LeftButton == ButtonState.Pressed;
+            bool prevPress = mPrevMouseState.LeftButton == ButtonState.Pressed;
+
+            return nowPress && !prevPress;
+        }
+
+        public bool RClick()
+        {
+            bool nowPress = mMouseState.RightButton == ButtonState.Pressed;
+            bool prevPress = mPrevMouseState.RightButton == ButtonState.Pressed;
+
+            return nowPress && !prevPress;
+        }
+
+        public Point GetMousePos()
+        {
+            return mMouseState.Position;
         }
     }
 }

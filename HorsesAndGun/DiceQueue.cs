@@ -10,7 +10,7 @@ namespace HorsesAndGun
 {
     internal class DiceQueue
     {
-        const int NUM_DICE = 5;
+        const int NUM_DICE = 8;
 
         Dice[] mDiceArray;
 
@@ -28,9 +28,9 @@ namespace HorsesAndGun
         {
             Dice dice = mDiceArray[0];
 
-            for(int i = mDiceArray.Length - 2; i > 0; i--)
+            for(int i = 0; i < mDiceArray.Length - 1; i++)
             {
-                mDiceArray[i] = mDiceArray[i + 1];
+                mDiceArray[i].Value = mDiceArray[i + 1].Value;
             }
 
             mDiceArray[NUM_DICE-1].Roll();

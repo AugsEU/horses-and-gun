@@ -58,7 +58,7 @@ namespace HorsesAndGun
 
         public override void Update(GameTime gameTime)
         {
-            if (InputManager.I.KeyPressed(Keys.Enter))
+            if (InputManager.I.KeyPressed(Keys.Enter) || InputManager.I.LClick())
             {
                 ScreenManager.I.ActivateScreen(ScreenType.MainGame);
             }

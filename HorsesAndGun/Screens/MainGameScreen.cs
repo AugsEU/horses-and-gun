@@ -10,8 +10,14 @@ namespace HorsesAndGun
 {
     internal class MainGameScreen : Screen
     {
+        const int NUM_LANES = 5;
+
+
         Texture2D mBackground;
         Texture2D[] mDiceTextures;
+
+        int mGunLane;
+        Texture2D mGunTexture;
 
         DiceQueue mDiceQueue;
 
@@ -19,11 +25,13 @@ namespace HorsesAndGun
         {
             mDiceQueue = new DiceQueue();
             mDiceTextures = new Texture2D[6];
+            mGunLane = 0;
         }
 
         public override void LoadContent(ContentManager content)
         {
             mBackground = content.Load<Texture2D>("main_bg");
+            mGunTexture = content.Load<Texture2D>("gun");
 
             mDiceTextures[0] = content.Load<Texture2D>("Dice1");
             mDiceTextures[1] = content.Load<Texture2D>("Dice2");
@@ -41,6 +49,25 @@ namespace HorsesAndGun
         public override void OnDeactivate()
         {
 
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if (InputManager.I.LClick())
+            {
+                mDiceQueue.PopDice();
+            }
+
+            DecideGunPosition();
+        }
+
+        public void DecideGunPosition()
+        {
+            Point mousePos = InputManager.I.GetMousePos();
+
+            mGunLane = Math.Max(0, (mousePos.Y - 29) / 50);
+
+            mGunLane = Math.Min(mGunLane, NUM_LANES - 1);
         }
 
         public override RenderTarget2D DrawToRenderTarget(DrawInfo info)
@@ -62,30 +89,38 @@ namespace HorsesAndGun
             info.spriteBatch.Draw(mBackground, Vector2.Zero, Color.White);
 
             DrawDice(info);
-
-
+            DrawGun(info);
             
             info.spriteBatch.End();
 
             return mScreenTarget;
         }
 
-        public override void Update(GameTime gameTime)
+        private void DrawGun(DrawInfo info)
         {
-            if(InputManager.I.KeyPressed(Keys.A))
-            {
-                mDiceQueue.PopDice();
-            }
+            Vector2 startPoint = new Vector2(0.0f, 29.0f);
+            Vector2 spacing = new Vector2(0.0f, 50.0f);
+
+            startPoint += spacing * mGunLane;
+
+            info.spriteBatch.Draw(mGunTexture, startPoint, Color.White);
         }
 
         private void DrawDice(DrawInfo info)
         {
-            Vector2 startPoint = new Vector2(30.0f, 30.0f);
-            Vector2 spacing =new Vector2(70.0f,0.0f);
+            Vector2 startPoint = new Vector2(9.0f, 287.0f);
 
-            for(int i = 0; i < mDiceQueue.GetDiceNum(); i++)
+            //Speical dice
+            Texture2D texture = GetDiceTexture(mDiceQueue.PeekDice(0));
+            info.spriteBatch.Draw(texture, startPoint, Color.White);
+
+
+            startPoint = new Vector2(110.5f, 287.0f);
+            Vector2 spacing =new Vector2(73.0f,0.0f);
+
+            for(int i = 1; i < mDiceQueue.GetDiceNum(); i++)
             {
-                Texture2D texture = GetDiceTexture(mDiceQueue.PeekDice(i));
+                texture = GetDiceTexture(mDiceQueue.PeekDice(i));
 
                 info.spriteBatch.Draw(texture, startPoint, Color.White);
 
