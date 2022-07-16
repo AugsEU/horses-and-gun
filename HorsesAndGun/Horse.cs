@@ -31,24 +31,32 @@ namespace HorsesAndGun
 
     internal class Horse : Entity
     {
+        //Position
         int mTileIndex;
         int mTrackIndex;
-
         int mReservedTile;
         int mReservedTrack;
-        Animator mIdleAnim;
+        
+        //Orders
         Queue<HorseOrder> mOrderQueue;
         HorseOrder mCurrentOrder;
 
+        //Lerp data
         Vector2 mDestinationPosition;
         Vector2 mDeltaDraw;
 
         MonoTimer mMoveTimer;
         double mMoveTotal;
 
+        //Textures
+        Animator mIdleAnim;
+        Animator mRunAnim;
+
         public Horse(Vector2 _pos, int _tileIndex, int _trackIndex) : base(_pos)
         {
             mIdleAnim = new Animator(Animator.PlayType.Loop);
+            mRunAnim = new Animator(Animator.PlayType.Loop);
+
             mOrderQueue = new Queue<HorseOrder>();
 
             mTileIndex = _tileIndex;
@@ -72,6 +80,21 @@ namespace HorsesAndGun
             mIdleAnim.LoadFrame(content, "Horse/horse-stand2", 0.5f);
             mIdleAnim.LoadFrame(content, "Horse/horse-stand3", 0.5f);
             mIdleAnim.Play();
+
+            const float RUN_ANIM_SPEED = 0.1f;
+            mRunAnim.LoadFrame(content, "Horse/horse_run_1", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_2", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_3", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_4", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_5", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_6", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_7", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_8", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_9", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_10", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_11", RUN_ANIM_SPEED);
+            mRunAnim.LoadFrame(content, "Horse/horse_run_12", RUN_ANIM_SPEED);
+            mRunAnim.Play();
         }
 
         public override Rect2f ColliderBounds()
@@ -84,6 +107,11 @@ namespace HorsesAndGun
         public override void Draw(DrawInfo info)
         {
             Texture2D texture = mIdleAnim.GetCurrentTexture();
+
+            if(mCurrentOrder.type != HorseOrderType.none)
+            {
+                texture = mRunAnim.GetCurrentTexture();
+            }
 
             Vector2 pos = mDeltaDraw + mPosition;
 
@@ -109,6 +137,7 @@ namespace HorsesAndGun
         public override void Update(GameTime gameTime)
         {
             mIdleAnim.Update(gameTime);
+            mRunAnim.Update(gameTime);
 
             UpdateCurrentOrder(gameTime);
         }
