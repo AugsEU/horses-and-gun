@@ -12,7 +12,6 @@ namespace HorsesAndGun
     {
         const int NUM_LANES = 5;
 
-
         Texture2D mBackground;
         Texture2D[] mDiceTextures;
 
@@ -53,12 +52,34 @@ namespace HorsesAndGun
 
         public override void Update(GameTime gameTime)
         {
-            if (InputManager.I.LClick())
-            {
-                mDiceQueue.PopDice();
-            }
+            EntityManager.I.Update(gameTime);
+
+            HandleInput(gameTime);
 
             DecideGunPosition();
+        }
+
+        private void HandleInput(GameTime gameTime)
+        {
+            if (InputManager.I.LClick())
+            {
+                FireGun(gameTime);
+            }
+        }
+
+        private void FireGun(GameTime gameTime)
+        {
+            Dice diceToShoot = mDiceQueue.PopDice();
+
+            Texture2D diceTex = GetDiceTexture(diceToShoot);
+
+            Vector2 speed = new Vector2(20.0f, 0.0f);
+            Vector2 startPos = new Vector2(65.0f, 180.0f);
+
+            startPos.Y = mGunLane * 50.0f + 43.0f;
+
+
+            EntityManager.I.RegisterEntity(new MovingDie(startPos, speed, diceTex), mContentManager);
         }
 
         public void DecideGunPosition()
@@ -87,6 +108,8 @@ namespace HorsesAndGun
                                     RasterizerState.CullNone);
 
             info.spriteBatch.Draw(mBackground, Vector2.Zero, Color.White);
+
+            EntityManager.I.Draw(info);
 
             DrawDice(info);
             DrawGun(info);
