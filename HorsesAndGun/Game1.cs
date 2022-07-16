@@ -66,7 +66,15 @@ namespace HorsesAndGun
             ScreenManager.I.LoadAllScreens(this.Content, _graphics);
             FontManager.I.LoadAllFonts(this.Content);
 
-            ScreenManager.I.ActivateScreen(ScreenType.Intro);
+            //
+
+            // ROSS BUTTON SCREEN FIRST FOR TESTING //
+
+            ScreenManager.I.ActivateScreen(ScreenType.RossButtonsScreen);
+
+            //
+
+            //ScreenManager.I.ActivateScreen(ScreenType.Intro);
         }
 
         protected override void Update(GameTime gameTime)
