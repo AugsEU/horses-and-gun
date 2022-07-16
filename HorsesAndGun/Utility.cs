@@ -38,6 +38,11 @@ namespace HorsesAndGun
             rhs = temp;
         }
 
+        public static Vector2 LerpVec(Vector2 start, Vector2 end, float t)
+        {
+            return start * (1.0f - t) + end * t;
+        }
+
         public static Vector2 GetNormal(CardinalDirection dir)
         {
             switch (dir)
