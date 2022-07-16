@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
+using Nito.Collections;
 
 namespace HorsesAndGun
 {
@@ -38,7 +39,7 @@ namespace HorsesAndGun
         int mReservedTrack;
         
         //Orders
-        Queue<HorseOrder> mOrderQueue;
+        Deque<HorseOrder> mOrderQueue;
         HorseOrder mCurrentOrder;
 
         //Lerp data
@@ -57,7 +58,7 @@ namespace HorsesAndGun
             mIdleAnim = new Animator(Animator.PlayType.Loop);
             mRunAnim = new Animator(Animator.PlayType.Loop);
 
-            mOrderQueue = new Queue<HorseOrder>();
+            mOrderQueue = new Deque<HorseOrder>();
 
             mTileIndex = _tileIndex;
             mTrackIndex = _trackIndex;
@@ -181,12 +182,22 @@ namespace HorsesAndGun
 
         public void QueueOrder(HorseOrder order)
         {
-            mOrderQueue.Enqueue(order);
+            mOrderQueue.AddToBack(order);
+        }
+
+        public void QueueOrderFront(HorseOrderType _type, int _amount)
+        {
+            mOrderQueue.AddToFront(new HorseOrder(_type, _amount));
+        }
+
+        public void QueueOrderFront(HorseOrder order)
+        {
+            mOrderQueue.AddToFront(order);
         }
 
         public HorseOrder PopTopOrder()
         {
-            return mOrderQueue.Dequeue();
+            return mOrderQueue.RemoveFromFront();
         }
 
         public void ExecuteOrder(HorseOrder order, Point finalPos)

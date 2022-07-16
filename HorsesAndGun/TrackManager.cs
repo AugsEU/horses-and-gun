@@ -185,7 +185,11 @@ namespace HorsesAndGun
                 {
                     horse.FinishOrder();
 
-                    //TO DO: Tile effects here.
+                    TrackTile steppedOn = mTiles[horse.TrackIndex, horse.TileIndex];
+
+                    steppedOn.ApplyEffect(horse, this);
+
+                    mTiles[horse.TrackIndex, horse.TileIndex] = new BasicTile(mContentManager);
                 }
             }
         }

@@ -21,5 +21,10 @@ namespace HorsesAndGun.Tiles
         {
             return mTexture;
         }
+
+        public override void ApplyEffect(Horse horse, TrackManager trackManager)
+        {
+
+        }
     }
 }
