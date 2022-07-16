@@ -58,13 +58,14 @@ namespace HorsesAndGun
             {
                 for (int tile = 0; tile < NUM_TILES_PER_TRACK; tile++)
                 {
-                    mTiles[track, tile] = CreateNextTrackTile();
+                    mTiles[track, tile] = CreateNextTrackTile(track);
                 }
             }
 
             for(int horse = 0; horse < NUM_HORSES; horse++)
             {
-                mHorses[horse] = new Horse(Vector2.Zero, 6, NUM_TRACKS - horse - 1);
+                mHorses[horse] = new Horse(Vector2.Zero, 5, NUM_TRACKS - horse - 1);
+                mTiles[NUM_TRACKS - horse - 1, 5] = new BasicTile(mContentManager);
                 EntityManager.I.RegisterEntity(mHorses[horse], mContentManager);
             }
         }
@@ -125,7 +126,7 @@ namespace HorsesAndGun
                     mTiles[track, tile] = mTiles[track, tile+1];
                 }
 
-                mTiles[track, NUM_TILES_PER_TRACK - 1] = CreateNextTrackTile();
+                mTiles[track, NUM_TILES_PER_TRACK - 1] = CreateNextTrackTile(track);
             }
 
             for (int h = 0; h < NUM_HORSES; h++)
@@ -282,11 +283,23 @@ namespace HorsesAndGun
             return false;
         }
 
-        private TrackTile CreateNextTrackTile()
+        private TrackTile CreateNextTrackTile(int trackNum)
         {
+            //Plus tile
             if(RandomManager.I.GetIntInRange(1,10) >= 9)
             {
-                return new PlusTile(mContentManager);
+                int moveAmount = 1;
+                switch(trackNum)
+                {
+                    case 0: moveAmount =    RandomManager.I.GetIntInRange(2, 3); break;
+                    case 1: moveAmount =    RandomManager.I.GetIntInRange(2, 3); break;
+                    case 2: moveAmount =    RandomManager.I.GetIntInRange(1, 3); break;
+                    case 3: moveAmount =    RandomManager.I.GetIntInRange(1, 2); break;
+                    case 4: moveAmount =    1; break;
+
+                }
+
+                return new PlusTile(mContentManager, moveAmount);
             }
 
             return new BasicTile(mContentManager);
