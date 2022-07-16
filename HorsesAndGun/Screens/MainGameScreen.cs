@@ -12,18 +12,25 @@ namespace HorsesAndGun
     {
         const int NUM_LANES = 5;
 
+        //Textures
         Texture2D mBackground;
         Texture2D[] mDiceTextures;
 
         int mGunLane;
         Texture2D mGunTexture;
 
+        //Dice
         DiceQueue mDiceQueue;
+        
+        //Tiles
+        TrackManager mTrackManager;
+
 
         public MainGameScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
         {
             mDiceQueue = new DiceQueue();
             mDiceTextures = new Texture2D[6];
+            mTrackManager = new TrackManager(content);
             mGunLane = 0;
         }
 
@@ -42,7 +49,10 @@ namespace HorsesAndGun
 
         public override void OnActivate()
         {
+            mDiceQueue = new DiceQueue();
+            mGunLane = 0;
 
+            mTrackManager.Init();
         }
 
         public override void OnDeactivate()
@@ -53,6 +63,7 @@ namespace HorsesAndGun
         public override void Update(GameTime gameTime)
         {
             EntityManager.I.Update(gameTime);
+            mTrackManager.Update(gameTime);
 
             HandleInput(gameTime);
 
@@ -78,7 +89,6 @@ namespace HorsesAndGun
 
             startPos.Y = mGunLane * 50.0f + 43.0f;
 
-
             EntityManager.I.RegisterEntity(new MovingDie(startPos, speed, diceTex), mContentManager);
         }
 
@@ -93,10 +103,6 @@ namespace HorsesAndGun
 
         public override RenderTarget2D DrawToRenderTarget(DrawInfo info)
         {
-            SpriteFont pixelFont = FontManager.I.GetFont("Pixica-24");
-
-            Vector2 centre = new Vector2(mScreenTarget.Width / 2, mScreenTarget.Height / 2);
-
             //Draw out the game area
             info.device.SetRenderTarget(mScreenTarget);
             info.device.Clear(Color.SaddleBrown);
@@ -109,7 +115,9 @@ namespace HorsesAndGun
 
             info.spriteBatch.Draw(mBackground, Vector2.Zero, Color.White);
 
+            mTrackManager.Draw(info);
             EntityManager.I.Draw(info);
+
 
             DrawDice(info);
             DrawGun(info);
