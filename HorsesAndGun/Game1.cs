@@ -9,7 +9,7 @@ namespace HorsesAndGun
 {
     public class Game1 : Game
     {
-        public static Rectangle sRenderTargetRect;
+        public static Rectangle sRenderTargetRect = new Rectangle(0,0,1,1);
 
         private const double FRAME_RATE = 60d;
         private const int MIN_HEIGHT = Screen.SCREEN_HEIGHT;
