@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Profile>Reach</Profile>
+  <Platform>Windows</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Dice1.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Dice2.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Dice3.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Dice4.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Dice5.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Dice6.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Fonts/Pixica.spritefont</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/Fonts/Pixica-Small.spritefont</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/gun.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/main_bg.png</File>
+    <File>C:/Users/Ross/Desktop/horse n gun/horses-and-gun/HorsesAndGun/Content/temp_button.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

@@ -11,6 +11,9 @@ namespace HorsesAndGun
 {
     enum ScreenType
     {
+        // ROSS BUTTON SCREEN FOR TESTING //
+        RossButtonsScreen,
+
         Intro,
         MainMenu,
         Options,
@@ -28,6 +31,9 @@ namespace HorsesAndGun
         public void LoadAllScreens(ContentManager content, GraphicsDeviceManager deviceManager)
         {
             mScreens.Clear();
+
+            // ROSS BUTTON SCREEN FOR TESTING //
+            LoadScreen(ScreenType.RossButtonsScreen, new RossButtonsScreen(content, deviceManager), content);
 
             LoadScreen(ScreenType.Intro, new IntroScreen(content, deviceManager), content);
             LoadScreen(ScreenType.MainMenu, new MainMenuScreen(content, deviceManager), content);
@@ -47,7 +53,7 @@ namespace HorsesAndGun
         {
             Screen activeScreen = GetActiveScreen();
 
-            if(!(activeScreen is null))
+            if (!(activeScreen is null))
             {
                 GetActiveScreen().Update(gameTime);
             }
