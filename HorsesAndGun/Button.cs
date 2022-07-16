@@ -40,10 +40,8 @@ namespace HorsesAndGun
         {
             mIsMouseOverButton = false; // Default to false so can then be checked for
 
-            //Point mouseScreenPosition = InputManager.I.GetMousePos();
-            //Rectangle mousePoint = new Rectangle(mouseScreenPosition, new Point(1, 1));
-
-            Rectangle mousePoint = new Rectangle(mCurrentMouse.X, mCurrentMouse.Y, 1, 1);
+            Point mouseScreenPosition = InputManager.I.GetMousePos();
+            Rectangle mousePoint = new Rectangle(mouseScreenPosition, new Point(1, 1));
 
             if (mousePoint.Intersects(mBounds))
             {
