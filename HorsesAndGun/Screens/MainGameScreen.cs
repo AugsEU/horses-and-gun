@@ -89,7 +89,7 @@ namespace HorsesAndGun
 
             startPos.Y = mGunLane * 50.0f + 43.0f;
 
-            EntityManager.I.RegisterEntity(new MovingDie(startPos, speed, diceTex), mContentManager);
+            EntityManager.I.RegisterEntity(new MovingDie(startPos, speed, diceToShoot, diceTex), mContentManager);
         }
 
         public void DecideGunPosition()

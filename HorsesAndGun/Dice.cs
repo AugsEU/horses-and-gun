@@ -17,6 +17,11 @@ namespace HorsesAndGun
             mValue = _value;
         }
 
+        public Dice(Dice _dice)
+        {
+            mValue = _dice.mValue;
+        }
+
         public Dice()
         {
             Roll();

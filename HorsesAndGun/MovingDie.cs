@@ -15,12 +15,28 @@ namespace HorsesAndGun
 
         float mRotation;
         Vector2 mSpeed;
+        Dice mDice;
 
-        public MovingDie(Vector2 _pos, Vector2 _speed, Texture2D _dice_tex) : base(_pos)
+        bool mEnabled;
+
+        public MovingDie(Vector2 _pos, Vector2 _speed, Dice _dice, Texture2D _dice_tex) : base(_pos)
         {
             mTexture = _dice_tex;
             mRotation = 0.0f;
+            mDice = _dice;
             mSpeed = _speed;
+
+            mEnabled = true;
+        }
+
+        public bool GetEnabled()
+        {
+            return mEnabled;
+        }
+
+        public Dice GetDice()
+        {
+            return mDice;
         }
 
         public override void LoadContent(ContentManager content)
@@ -43,9 +59,16 @@ namespace HorsesAndGun
             mRotation += ROT_SPEED * Util.GetDeltaT(gameTime);
         }
 
+        public override void Kill()
+        {
+            mEnabled = false;
+
+            base.Kill();
+        }
+
         public override bool DeleteMe()
         {
-            return mPosition.X > Screen.SCREEN_WIDTH + 10.0f;
+            return mEnabled == false || mPosition.X > Screen.SCREEN_WIDTH + 10.0f;
         }
     }
 }

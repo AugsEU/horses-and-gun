@@ -11,9 +11,9 @@ namespace HorsesAndGun
 {
     internal class TrackManager
     {
-        const int NUM_TRACKS = 5;
-        const int NUM_HORSES = 3;
-        const int NUM_TILES_PER_TRACK = 11;
+        public const int NUM_TRACKS = 5;
+        public const int NUM_HORSES = 3;
+        public const int NUM_TILES_PER_TRACK = 11;
 
         Vector2 TRACK_ORIGIN = new Vector2(83.0f, 28.0f);
         Vector2 TRACK_OFFSET = new Vector2(0.0f, 50.0f);
@@ -107,6 +107,9 @@ namespace HorsesAndGun
 
             //Update horse positions
             SetHorsePositions(gameTime);
+            UpdateHorseOrders(gameTime);
+
+
         }
 
         private void BeginShift(GameTime gameTime)
@@ -129,7 +132,7 @@ namespace HorsesAndGun
             {
                 Horse horse = mHorses[h];
 
-                horse.TileIndex--;
+                horse.ShiftHorseBack();
             }
 
             mDynamicOffset = TILE_OFFSET;
@@ -156,7 +159,123 @@ namespace HorsesAndGun
                 Horse horse = mHorses[h];
 
                 horse.position = GetTilePos(horse.TrackIndex, horse.TileIndex);
+                horse.SetDestPosition(GetTilePos(horse.GetReservedPoint().Y, horse.GetReservedPoint().X));
             }
+        }
+
+        private void UpdateHorseOrders(GameTime gameTime)
+        {
+            for (int h = 0; h < NUM_HORSES; h++)
+            {
+                Horse horse = mHorses[h];
+
+                if(horse.ReadyToMove())
+                {
+                    HorseOrder orderToDo = horse.PopTopOrder();
+
+                    Point dest = MakeHorseOrderValid(horse, ref orderToDo);
+
+                    if (orderToDo.type != HorseOrderType.none)
+                    {
+                        horse.ExecuteOrder(orderToDo, dest);
+                        horse.ReserveTile(dest);
+                    }
+                }
+                else if(horse.FinishedMove())
+                {
+                    horse.FinishOrder();
+
+                    //TO DO: Tile effects here.
+                }
+            }
+        }
+
+        private Point MakeHorseOrderValid(Horse horse,ref HorseOrder order)
+        {
+            if(order.type == HorseOrderType.moveTile)
+            {
+                Point startPt = horse.GetCurrentPoint();
+                Point destination = startPt + new Point(order.moveAmount, 0);
+                destination.X = Math.Clamp(destination.X, 0, NUM_TILES_PER_TRACK - 1);
+
+                if (destination.X == startPt.X)
+                {
+                    order.type = HorseOrderType.none;
+                    return startPt;
+                }
+
+                while (IsPointReserved(destination))
+                {
+                    destination.X -= Math.Sign(order.moveAmount);
+
+                    if(destination.X == startPt.X)
+                    {
+                        order.type = HorseOrderType.none;
+                        return startPt;
+                    }
+                }
+
+                order.moveAmount = destination.X - startPt.X;
+
+                if (destination.X == startPt.X)
+                {
+                    order.type = HorseOrderType.none;
+                    return startPt;
+                }
+
+                return destination;
+            }
+            else if(order.type == HorseOrderType.moveTrack)
+            {
+                Point startPt = horse.GetCurrentPoint();
+                Point destination = startPt + new Point(0, order.moveAmount);
+                destination.Y = Math.Clamp(destination.Y, 0, NUM_TRACKS - 1);
+
+                if (destination.Y == startPt.Y)
+                {
+                    order.type = HorseOrderType.none;
+                    return startPt;
+                }
+
+                while (IsPointReserved(destination))
+                {
+                    destination.Y -= Math.Sign(order.moveAmount);
+
+                    if (destination.Y == startPt.Y)
+                    {
+                        order.type = HorseOrderType.none;
+                        return startPt;
+                    }
+                }
+
+                order.moveAmount = destination.Y - startPt.Y;
+
+                if (destination.Y == startPt.Y)
+                {
+                    order.type = HorseOrderType.none;
+                    return startPt;
+                }
+
+                return destination;
+            }
+
+            order.type = HorseOrderType.none;
+            return horse.GetCurrentPoint();
+        }
+
+        private bool IsPointReserved(Point pt)
+        {
+            for (int h = 0; h < NUM_HORSES; h++)
+            {
+                Horse horse = mHorses[h];
+
+                if (horse.GetReservedPoint() == pt)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private TrackTile CreateNextTrackTile()
@@ -185,7 +304,7 @@ namespace HorsesAndGun
             }
         }
 
-        private Vector2 GetTilePos(int track, int tile)
+        public Vector2 GetTilePos(int track, int tile)
         {
             return mDynamicOffset + TRACK_ORIGIN + PADDING + track * TRACK_OFFSET + tile * TILE_OFFSET;
         }

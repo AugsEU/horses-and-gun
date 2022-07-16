@@ -26,7 +26,7 @@ namespace HorsesAndGun
 
         public Dice PopDice()
         {
-            Dice dice = mDiceArray[0];
+            Dice dice = new Dice(mDiceArray[0]);
 
             for(int i = 0; i < mDiceArray.Length - 1; i++)
             {
