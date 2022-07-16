@@ -22,7 +22,7 @@ namespace HorsesAndGun
 
         Vector2 mDynamicOffset = new Vector2(0.0f, 0.0f);
 
-        const double START_FALL_TIME = 3000.0;
+        const double START_FALL_TIME = 1000.0;
 
         TrackTile[,] mTiles;
         ContentManager mContentManager;
@@ -30,26 +30,30 @@ namespace HorsesAndGun
         Horse[] mHorses;
 
         //Timings
-        double mFallTime = 3000.0;
+        double mFallTime = START_FALL_TIME;
         MonoTimer mFallingTimer;
 
-        double mShiftTime = 3000.0;
+        double mShiftTime = 1000.0;
         MonoTimer mShiftTimer;
 
         public TrackManager(ContentManager _ContentManager)
         {
-            mTiles = new TrackTile[NUM_TRACKS, NUM_TILES_PER_TRACK];
             mContentManager = _ContentManager;
+        }
 
+        public void Init()
+        {
+            mDynamicOffset = new Vector2(0.0f, 0.0f);
+            mFallTime = START_FALL_TIME;
+            mShiftTime = START_FALL_TIME;
+
+            mTiles = new TrackTile[NUM_TRACKS, NUM_TILES_PER_TRACK];
             mHorses = new Horse[NUM_HORSES];
 
             //Timings
             mFallingTimer = new MonoTimer();
             mShiftTimer = new MonoTimer();
-        }
 
-        public void Init()
-        {
             mFallTime = START_FALL_TIME;
             mFallingTimer.FullReset();
             mShiftTimer.FullReset();
@@ -68,6 +72,23 @@ namespace HorsesAndGun
                 mTiles[NUM_TRACKS - horse - 1, 5] = new BasicTile(mContentManager);
                 EntityManager.I.RegisterEntity(mHorses[horse], mContentManager);
             }
+
+            SetHorsePositions();
+        }
+
+        public List<Vector2> GetGameOverPoints()
+        {
+            List<Vector2> retList = new List<Vector2>();
+
+            foreach (Horse horse in mHorses)
+            {
+                if(horse.IsAlive() == false)
+                {
+                    retList.Add(horse.GetEffectivePos());
+                }
+            }
+
+            return retList;
         }
 
         public void Update(GameTime gameTime)
@@ -107,9 +128,9 @@ namespace HorsesAndGun
             }
 
             //Update horse positions
-            SetHorsePositions(gameTime);
+            SetHorsePositions();
             UpdateHorseOrders(gameTime);
-
+            SetHorsePositions();
 
         }
 
@@ -132,8 +153,12 @@ namespace HorsesAndGun
             for (int h = 0; h < NUM_HORSES; h++)
             {
                 Horse horse = mHorses[h];
-
                 horse.ShiftHorseBack();
+
+                if(horse.GetReservedPoint().X < 0)
+                {
+                    horse.Kill();
+                }
             }
 
             mDynamicOffset = TILE_OFFSET;
@@ -153,7 +178,7 @@ namespace HorsesAndGun
             mFallingTimer.Start();
         }
 
-        private void SetHorsePositions(GameTime gameTime)
+        private void SetHorsePositions()
         {
             for (int h = 0; h < NUM_HORSES; h++)
             {

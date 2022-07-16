@@ -53,6 +53,9 @@ namespace HorsesAndGun
         Animator mIdleAnim;
         Animator mRunAnim;
 
+        //State
+        bool mAlive;
+
         public Horse(Vector2 _pos, int _tileIndex, int _trackIndex) : base(_pos)
         {
             mIdleAnim = new Animator(Animator.PlayType.Loop);
@@ -69,7 +72,25 @@ namespace HorsesAndGun
             mMoveTimer = new MonoTimer();
             mMoveTotal = 0.0;
 
+            mAlive = true;
+
             ClearOrder();
+        }
+
+        public override void Kill()
+        {
+            mAlive = false;
+            base.Kill();
+        }
+
+        public bool IsAlive()
+        {
+            return mAlive;
+        }
+
+        public Vector2 GetEffectivePos()
+        {
+            return mPosition + mDeltaDraw;
         }
 
         public override void LoadContent(ContentManager content)
@@ -100,8 +121,7 @@ namespace HorsesAndGun
 
         public override Rect2f ColliderBounds()
         {
-            Vector2 pos = mDeltaDraw + mPosition;
-
+            Vector2 pos = GetEffectivePos();
             return new Rect2f(pos, pos + new Vector2(mTexture.Width, mTexture.Height));
         }
 
@@ -109,19 +129,13 @@ namespace HorsesAndGun
         {
             Texture2D texture = mIdleAnim.GetCurrentTexture();
 
-            if(mCurrentOrder.type != HorseOrderType.none)
+            if(mCurrentOrder.type != HorseOrderType.none || mOrderQueue.Count > 0)
             {
                 texture = mRunAnim.GetCurrentTexture();
             }
 
-            Vector2 pos = mDeltaDraw + mPosition;
+            info.spriteBatch.Draw(texture, GetEffectivePos(), Color.White);
 
-            if(mCurrentOrder.type == HorseOrderType.none)
-            {
-                mDeltaDraw = Vector2.Zero;
-            }
-
-            info.spriteBatch.Draw(texture, pos, Color.White);
         }
 
         public void ShiftHorseBack()
@@ -221,7 +235,7 @@ namespace HorsesAndGun
             }
             else
             {
-                return Math.Abs(order.moveAmount) * 200.0;
+                return Math.Abs(order.moveAmount) * 600.0;
             }
         }
 
@@ -239,6 +253,8 @@ namespace HorsesAndGun
         {
             mTileIndex = mReservedTile;
             mTrackIndex = mReservedTrack;
+            mDeltaDraw = Vector2.Zero;
+
             ClearOrder();
         }
 

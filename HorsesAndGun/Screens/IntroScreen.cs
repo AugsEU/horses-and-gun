@@ -34,7 +34,6 @@ namespace HorsesAndGun
 
         public override void OnDeactivate()
         {
-
         }
 
         public override RenderTarget2D DrawToRenderTarget(DrawInfo info)

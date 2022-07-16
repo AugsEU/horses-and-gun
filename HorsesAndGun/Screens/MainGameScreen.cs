@@ -14,6 +14,7 @@ namespace HorsesAndGun
 
         //Textures
         Texture2D mBackground;
+        Texture2D mGameOverCross;
         Texture2D[] mDiceTextures;
 
         //Gun
@@ -29,7 +30,14 @@ namespace HorsesAndGun
         //Tiles
         TrackManager mTrackManager;
 
-       
+        //Game Start
+        MonoTimer mReadyTimer;
+        const double mReadyTime = 2000.0;
+
+        //Game over
+        List<Vector2> mGameOverPoints;
+        MonoTimer mGameOverFadeTimer;
+        const double mGameOverFadeTime = 2400.0;
 
 
         public MainGameScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
@@ -39,6 +47,8 @@ namespace HorsesAndGun
             mTrackManager = new TrackManager(content);
             mGunReloadTimer = new MonoTimer();
             mShootAnim = new Animator(Animator.PlayType.OneShot);
+            mGameOverFadeTimer = new MonoTimer();
+            mReadyTimer = new MonoTimer();
             mGunLane = 0;
         }
 
@@ -46,6 +56,7 @@ namespace HorsesAndGun
         {
             mBackground = content.Load<Texture2D>("main_bg");
             mGunTexture = content.Load<Texture2D>("gun");
+            mGameOverCross = content.Load<Texture2D>("dead_x");
 
             mDiceTextures[0] = content.Load<Texture2D>("Dice1");
             mDiceTextures[1] = content.Load<Texture2D>("Dice2");
@@ -66,21 +77,61 @@ namespace HorsesAndGun
         public override void OnActivate()
         {
             mDiceQueue = new DiceQueue();
-
+            EntityManager.I.ClearEntities();
             mGunReloadTimer.FullReset();
             mGunReloadTime = 3000.0f;
             mGunLane = 0;
+            mGameOverPoints = null;
+
+            mReadyTimer.FullReset();
+            mReadyTimer.Start();
 
             mTrackManager.Init();
         }
 
         public override void OnDeactivate()
         {
+            EntityManager.I.ClearEntities();
+        }
 
+        private bool IsGameOver()
+        {
+            return mGameOverPoints != null && mGameOverPoints.Count > 0;
         }
 
         public override void Update(GameTime gameTime)
         {
+            if(mReadyTimer.IsPlaying())
+            {
+                if(mReadyTimer.GetElapsedMs() > mReadyTime)
+                {
+                    mReadyTimer.Stop();
+                }
+
+                return;
+            }
+
+            //Check for game over
+            mGameOverPoints = mTrackManager.GetGameOverPoints();
+
+            if (IsGameOver())
+            {
+                if(mGameOverFadeTimer.IsPlaying() == false)
+                {
+                    mGameOverFadeTimer.Start();
+                    mGunReloadTimer.Stop();
+                }
+
+                if (GetGameOverPercent() == 1.0f)
+                {
+                    if(InputManager.I.LClick())
+                    {
+                        ScreenManager.I.ActivateScreen(ScreenType.RossButtonsScreen);
+                    }
+                }
+                return;
+            }
+
             mShootAnim.Update(gameTime);
 
             //Reload timer stuff
@@ -89,8 +140,8 @@ namespace HorsesAndGun
                 mGunReloadTimer.Stop();
             }
 
-            EntityManager.I.Update(gameTime);
             mTrackManager.Update(gameTime);
+            EntityManager.I.Update(gameTime);
 
             HandleInput(gameTime);
 
@@ -131,6 +182,16 @@ namespace HorsesAndGun
             return 1.0f;
         }
 
+        private float GetGameOverPercent()
+        {
+            if (mGameOverFadeTimer.IsPlaying())
+            {
+                return Math.Min((float)(mGameOverFadeTimer.GetElapsedMs() / mGameOverFadeTime), 1.0f);
+            }
+
+            return 1.0f;
+        }
+
         public void DecideGunPosition()
         {
             Point mousePos = InputManager.I.GetMousePos();
@@ -157,13 +218,63 @@ namespace HorsesAndGun
             mTrackManager.Draw(info);
             EntityManager.I.Draw(info);
 
-
             DrawDice(info);
             DrawGun(info);
+
+            if(IsGameOver())
+            {
+                DrawGameOver(info);
+            }
+
+            if(mReadyTimer.IsPlaying())
+            {
+                DrawGameStart(info);
+            }
             
             info.spriteBatch.End();
 
             return mScreenTarget;
+        }
+
+        private void DrawGameStart(DrawInfo info)
+        {
+            Rect2f screenBG = new Rect2f(Vector2.Zero, new Vector2(Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT));
+            Util.DrawRect(info, screenBG, new Color(0, 0, 0, 128));
+            Vector2 centre = new Vector2(mScreenTarget.Width / 2, mScreenTarget.Height / 2);
+
+            Util.DrawStringCentred(info.spriteBatch, FontManager.I.GetFont("Pixica-24"), centre, Color.Wheat, "Get ready...");
+        }
+
+        private void DrawGameOver(DrawInfo info)
+        {
+            SpriteFont pixelFont = FontManager.I.GetFont("Pixica-24");
+            SpriteFont smallPixelFont = FontManager.I.GetFont("Pixica Micro-24");
+
+            foreach (Vector2 pos in mGameOverPoints)
+            {
+                info.spriteBatch.Draw(mGameOverCross, pos, Color.White);
+            }
+
+            int alpha = (int)(255.0f * GetGameOverPercent());
+
+            Rect2f screenBG = new Rect2f(Vector2.Zero, new Vector2(Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT));
+
+            Util.DrawRect(info, screenBG, new Color(0, 0, 0, alpha));
+
+            Vector2 centre = new Vector2(mScreenTarget.Width / 2, mScreenTarget.Height / 2);
+
+            float falpha = GetGameOverPercent();
+            Color textColor = new Color(Color.Wheat, falpha);
+
+            Util.DrawStringCentred(info.spriteBatch, pixelFont, centre + new Vector2(0.0f, -130.0f), textColor, "GAME OVER!");
+
+            Util.DrawStringCentred(info.spriteBatch, pixelFont, centre , textColor, "Score: ");
+            Util.DrawStringCentred(info.spriteBatch, pixelFont, centre + new Vector2(0.0f, 30.0f), textColor, "High score: ");
+
+            if (falpha == 1.0f)
+            {
+                Util.DrawStringCentred(info.spriteBatch, smallPixelFont, centre + new Vector2(0.0f, 130.0f), textColor, "Click to continue...");
+            }
         }
 
         private void DrawGun(DrawInfo info)
