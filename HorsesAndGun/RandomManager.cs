@@ -13,5 +13,10 @@ namespace HorsesAndGun
             return mRandom.Next(low, high + 1);
         }
 
+        public bool GetRandBool(int truePercent)
+        {
+            return mRandom.Next(0, 100) < truePercent;
+        }
+
     }
 }

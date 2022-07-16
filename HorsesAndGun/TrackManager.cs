@@ -286,7 +286,7 @@ namespace HorsesAndGun
         private TrackTile CreateNextTrackTile(int trackNum)
         {
             //Plus tile
-            if(RandomManager.I.GetIntInRange(1,10) >= 9)
+            if(RandomManager.I.GetRandBool(20))
             {
                 int moveAmount = 1;
                 switch(trackNum)
@@ -296,10 +296,24 @@ namespace HorsesAndGun
                     case 2: moveAmount =    RandomManager.I.GetIntInRange(1, 3); break;
                     case 3: moveAmount =    RandomManager.I.GetIntInRange(1, 2); break;
                     case 4: moveAmount =    1; break;
-
                 }
 
                 return new PlusTile(mContentManager, moveAmount);
+            }
+
+            if (RandomManager.I.GetRandBool(30))
+            {
+                bool goUp = true;
+                switch (trackNum)
+                {
+                    case 0: goUp = false; break;
+                    case 1: goUp = RandomManager.I.GetRandBool(20); break;
+                    case 2: goUp = RandomManager.I.GetRandBool(60); break;
+                    case 3: goUp = RandomManager.I.GetRandBool(90); break;
+                    case 4: goUp = true; break;
+                }
+
+                return new UpDownTile(mContentManager, goUp);
             }
 
             return new BasicTile(mContentManager);

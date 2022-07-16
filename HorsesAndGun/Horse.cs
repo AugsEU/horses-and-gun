@@ -217,11 +217,11 @@ namespace HorsesAndGun
         {
             if (order.type == HorseOrderType.moveTile)
             {
-                return order.moveAmount * 600.0;
+                return Math.Abs(order.moveAmount) * 600.0;
             }
             else
             {
-                return order.moveAmount * 200.0;
+                return Math.Abs(order.moveAmount) * 200.0;
             }
         }
 
