@@ -12,14 +12,9 @@ namespace HorsesAndGun.Tiles
     {
         Texture2D mTexture;
 
-        public BasicTile(ContentManager content)
+        public BasicTile(ContentManager content, string texName = "Tiles/basic_tile")
         {
-            mTexture = content.Load<Texture2D>(TexName());
-        }
-
-        protected virtual string TexName()
-        {
-            return "Tiles/basic_tile";
+            mTexture = content.Load<Texture2D>(texName);
         }
 
         public override Texture2D Draw(DrawInfo drawInfo)
