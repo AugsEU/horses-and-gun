@@ -104,6 +104,11 @@ namespace HorsesAndGun
                 }
             }
 
+            if(i >= mFrames.Count)
+            {
+                i = mFrames.Count - 1;
+            }
+
             return mFrames[i].mImage;
         }
 

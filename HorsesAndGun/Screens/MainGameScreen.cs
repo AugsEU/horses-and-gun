@@ -16,8 +16,12 @@ namespace HorsesAndGun
         Texture2D mBackground;
         Texture2D[] mDiceTextures;
 
+        //Gun
         int mGunLane;
         Texture2D mGunTexture;
+        Animator mShootAnim;
+        MonoTimer mGunReloadTimer;
+        double mGunReloadTime;
 
         //Dice
         DiceQueue mDiceQueue;
@@ -25,12 +29,16 @@ namespace HorsesAndGun
         //Tiles
         TrackManager mTrackManager;
 
+       
+
 
         public MainGameScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
         {
             mDiceQueue = new DiceQueue();
             mDiceTextures = new Texture2D[6];
             mTrackManager = new TrackManager(content);
+            mGunReloadTimer = new MonoTimer();
+            mShootAnim = new Animator(Animator.PlayType.OneShot);
             mGunLane = 0;
         }
 
@@ -45,11 +53,22 @@ namespace HorsesAndGun
             mDiceTextures[3] = content.Load<Texture2D>("Dice4");
             mDiceTextures[4] = content.Load<Texture2D>("Dice5");
             mDiceTextures[5] = content.Load<Texture2D>("Dice6");
+
+            mShootAnim.LoadFrame(content, "gun-fire1", 0.04f);
+            mShootAnim.LoadFrame(content, "gun-fire2", 0.05f);
+            mShootAnim.LoadFrame(content, "gun-fire3", 0.07f);
+            mShootAnim.LoadFrame(content, "gun-fire4", 0.55f);
+            mShootAnim.LoadFrame(content, "gun-fire5", 0.35f);
+            mShootAnim.LoadFrame(content, "gun-fire6", 0.35f);
+            mShootAnim.LoadFrame(content, "gun-fire7", 0.05f);
         }
 
         public override void OnActivate()
         {
             mDiceQueue = new DiceQueue();
+
+            mGunReloadTimer.FullReset();
+            mGunReloadTime = 3000.0f;
             mGunLane = 0;
 
             mTrackManager.Init();
@@ -62,6 +81,14 @@ namespace HorsesAndGun
 
         public override void Update(GameTime gameTime)
         {
+            mShootAnim.Update(gameTime);
+
+            //Reload timer stuff
+            if (mGunReloadTimer.GetElapsedMs() >= mGunReloadTime)
+            {
+                mGunReloadTimer.Stop();
+            }
+
             EntityManager.I.Update(gameTime);
             mTrackManager.Update(gameTime);
 
@@ -72,7 +99,7 @@ namespace HorsesAndGun
 
         private void HandleInput(GameTime gameTime)
         {
-            if (InputManager.I.LClick())
+            if (InputManager.I.LClick() && GetReloadPercent() == 1.0f)
             {
                 FireGun(gameTime);
             }
@@ -80,16 +107,28 @@ namespace HorsesAndGun
 
         private void FireGun(GameTime gameTime)
         {
+            //Shoot dice
             Dice diceToShoot = mDiceQueue.PopDice();
-
             Texture2D diceTex = GetDiceTexture(diceToShoot);
-
             Vector2 speed = new Vector2(20.0f, 0.0f);
             Vector2 startPos = new Vector2(65.0f, 180.0f);
-
             startPos.Y = mGunLane * 50.0f + 43.0f;
-
             EntityManager.I.RegisterEntity(new MovingDie(startPos, speed, diceToShoot, diceTex), mContentManager);
+
+            //Timer stuff
+            mGunReloadTimer.FullReset();
+            mGunReloadTimer.Start();
+            mShootAnim.Play();
+        }
+
+        private float GetReloadPercent()
+        {
+            if(mGunReloadTimer.IsPlaying())
+            {
+                return (float)(mGunReloadTimer.GetElapsedMs() / mGunReloadTime);
+            }
+
+            return 1.0f;
         }
 
         public void DecideGunPosition()
@@ -134,22 +173,35 @@ namespace HorsesAndGun
 
             startPoint += spacing * mGunLane;
 
-            info.spriteBatch.Draw(mGunTexture, startPoint, Color.White);
+            Texture2D gunTex = mGunTexture;
+
+            if(GetReloadPercent() != 1.0f)
+            {
+                gunTex = mShootAnim.GetCurrentTexture();
+            }
+
+            info.spriteBatch.Draw(gunTex, startPoint, Color.White);
         }
 
         private void DrawDice(DrawInfo info)
         {
-            Vector2 startPoint = new Vector2(9.0f, 287.0f);
+            Vector2 reloadPoint = new Vector2(9.0f, 287.0f);
+            Vector2 startPoint = new Vector2(110.5f, 287.0f);
+
+            float p = 1.0f - GetReloadPercent();
 
             //Speical dice
+            reloadPoint = Util.LerpVec(startPoint, reloadPoint, 1.0f - p);
             Texture2D texture = GetDiceTexture(mDiceQueue.PeekDice(0));
-            info.spriteBatch.Draw(texture, startPoint, Color.White);
+            info.spriteBatch.Draw(texture, reloadPoint, Color.White);
 
 
-            startPoint = new Vector2(110.5f, 287.0f);
+            
             Vector2 spacing =new Vector2(73.0f,0.0f);
 
-            for(int i = 1; i < mDiceQueue.GetDiceNum(); i++)
+            startPoint += spacing * (p);
+
+            for(int i = 1; i < mDiceQueue.GetDiceNum() - 1; i++)
             {
                 texture = GetDiceTexture(mDiceQueue.PeekDice(i));
 
@@ -157,6 +209,12 @@ namespace HorsesAndGun
 
                 startPoint += spacing;
             }
+
+            startPoint += spacing * (p);
+
+            texture = GetDiceTexture(mDiceQueue.PeekDice(mDiceQueue.GetDiceNum() - 1));
+
+            info.spriteBatch.Draw(texture, startPoint, Color.White);
         }
 
         Texture2D GetDiceTexture(Dice die)
