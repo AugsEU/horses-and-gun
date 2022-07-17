@@ -22,7 +22,7 @@ namespace HorsesAndGun
 
         Vector2 mDynamicOffset = new Vector2(0.0f, 0.0f);
 
-        const double START_FALL_TIME = 1000.0;
+        const double START_FALL_TIME = 1500.0;
 
         TrackTile[,] mTiles;
         ContentManager mContentManager;

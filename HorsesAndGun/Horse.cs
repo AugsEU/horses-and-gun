@@ -52,6 +52,8 @@ namespace HorsesAndGun
         //Textures
         Animator mIdleAnim;
         Animator mRunAnim;
+        Animator mJumpUpAnim;
+        Animator mJumpDownAnim;
 
         //State
         bool mAlive;
@@ -60,6 +62,8 @@ namespace HorsesAndGun
         {
             mIdleAnim = new Animator(Animator.PlayType.Loop);
             mRunAnim = new Animator(Animator.PlayType.Loop);
+            mJumpUpAnim = new Animator(Animator.PlayType.OneShot);
+            mJumpDownAnim = new Animator(Animator.PlayType.OneShot);
 
             mOrderQueue = new Deque<HorseOrder>();
 
@@ -117,6 +121,20 @@ namespace HorsesAndGun
             mRunAnim.LoadFrame(content, "Horse/horse_run_11", RUN_ANIM_SPEED);
             mRunAnim.LoadFrame(content, "Horse/horse_run_12", RUN_ANIM_SPEED);
             mRunAnim.Play();
+
+            const float JUMP_ANIM_SPEED = 0.075f;
+            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_1", JUMP_ANIM_SPEED);
+            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_2", JUMP_ANIM_SPEED);
+            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_3", JUMP_ANIM_SPEED);
+            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_4", JUMP_ANIM_SPEED);
+            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_5", JUMP_ANIM_SPEED);
+            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_6", JUMP_ANIM_SPEED);
+            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_7", JUMP_ANIM_SPEED);
+
+            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_7", RUN_ANIM_SPEED);
+            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_8", RUN_ANIM_SPEED);
+            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_9", RUN_ANIM_SPEED);
+            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_10", RUN_ANIM_SPEED);
         }
 
         public override Rect2f ColliderBounds()
@@ -127,11 +145,19 @@ namespace HorsesAndGun
 
         public override void Draw(DrawInfo info)
         {
-            Texture2D texture = mIdleAnim.GetCurrentTexture();
+            Texture2D texture = mRunAnim.GetCurrentTexture();
 
-            //if(mCurrentOrder.type != HorseOrderType.none || mOrderQueue.Count > 0)
+            if(mCurrentOrder.type == HorseOrderType.moveTrack)
             {
-                texture = mRunAnim.GetCurrentTexture();
+                if(mCurrentOrder.moveAmount < 0)
+                {
+                    texture = mJumpUpAnim.GetCurrentTexture();
+                }
+                else
+                {
+                    texture = mJumpDownAnim.GetCurrentTexture();
+                }
+                
             }
 
             info.spriteBatch.Draw(texture, GetEffectivePos(), Color.White);
@@ -151,6 +177,8 @@ namespace HorsesAndGun
 
         public override void Update(GameTime gameTime)
         {
+            mJumpUpAnim.Update(gameTime);
+            mJumpDownAnim.Update(gameTime);
             mIdleAnim.Update(gameTime);
             mRunAnim.Update(gameTime);
 
@@ -165,7 +193,14 @@ namespace HorsesAndGun
 
                 if(lerpVal < 1.0)
                 {
-                    mDeltaDraw = Util.LerpVec(Vector2.Zero, mDestinationPosition - mPosition, lerpVal);
+                    if (mCurrentOrder.type == HorseOrderType.moveTrack)
+                    {
+                        mDeltaDraw = Util.SmoothLerpVec(Vector2.Zero, mDestinationPosition - mPosition, lerpVal);
+                    }
+                    else
+                    {
+                        mDeltaDraw = Util.LerpVec(Vector2.Zero, mDestinationPosition - mPosition, lerpVal);
+                    }
                 }
                 else
                 {
@@ -224,6 +259,9 @@ namespace HorsesAndGun
                 mMoveTotal = OrderTime(mCurrentOrder);
                 mMoveTimer.FullReset();
                 mMoveTimer.Start();
+
+                mJumpUpAnim.Play();
+                mJumpDownAnim.Play();
             }
         }
 

@@ -322,8 +322,6 @@ namespace HorsesAndGun
             {
                 Util.DrawStringCentred(info.spriteBatch, pixelFont, centre + new Vector2(0.0f, 30.0f), textColor, "High score: " + ScoreManager.I.GetHighScore());
             }
-
-
         }
 
         private void DrawGun(DrawInfo info)

@@ -38,6 +38,15 @@ namespace HorsesAndGun
             rhs = temp;
         }
 
+        public static Vector2 SmoothLerpVec(Vector2 start, Vector2 end, float t)
+        {
+            t -= 0.5f;
+            t *= 2.0f;
+            t = (t * (2.0f - Math.Abs(t)) + 1) / 2.0f;
+
+            return start * (1.0f - t) + end * t;
+        }
+
         public static Vector2 LerpVec(Vector2 start, Vector2 end, float t)
         {
             return start * (1.0f - t) + end * t;
