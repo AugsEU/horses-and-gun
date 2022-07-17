@@ -10,6 +10,7 @@ namespace HorsesAndGun
     public class Game1 : Game
     {
         public static Rectangle sRenderTargetRect = new Rectangle(0,0,1,1);
+        public static Game1 self;
 
         private const double FRAME_RATE = 60d;
         private const int MIN_HEIGHT = Screen.SCREEN_HEIGHT;
@@ -21,6 +22,7 @@ namespace HorsesAndGun
 
         public Game1()
         {
+            self = this;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;

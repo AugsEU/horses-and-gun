@@ -67,7 +67,7 @@ namespace HorsesAndGun
 
             if (!mIsMouseOverButton)
             {
-                colour = Color.Gray;
+                colour = Color.LightGray;
             }
 
             info.spriteBatch.Draw(mTexture, mPosition, colour); 

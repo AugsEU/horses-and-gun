@@ -10,8 +10,8 @@ namespace HorsesAndGun
 {
     internal class RossButtonsScreen : Screen
     {
-        private Game1 game;
         private List<Button> mButtonList;
+        Texture2D mLogo;
 
         private void PlayButtonClick(object sender, EventArgs e)
         {
@@ -25,7 +25,7 @@ namespace HorsesAndGun
 
         private void QuitButtonClick(object sender, EventArgs e)
         {
-            game.Exit();
+            Game1.self.Exit();
         }
 
         public RossButtonsScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
@@ -36,19 +36,19 @@ namespace HorsesAndGun
         {
             Button playButton = new Button(content.Load<Texture2D>("temp_button"), content.Load<SpriteFont>("Fonts/Pixica"))
             {
-                mPosition = new Vector2(170, 80),
+                mPosition = new Vector2(196.5f, 160.0f),
                 mText = "Play"
             };
 
             Button optionsButton = new Button(content.Load<Texture2D>("temp_button"), content.Load<SpriteFont>("Fonts/Pixica"))
             {
-                mPosition = new Vector2(170, 140),
+                mPosition = new Vector2(196.5f, 220.0f),
                 mText = "Options"
             };
 
             Button quitButton = new Button(content.Load<Texture2D>("temp_button"), content.Load<SpriteFont>("Fonts/Pixica"))
             {
-                mPosition = new Vector2(170, 200),
+                mPosition = new Vector2(196.5f, 280.0f),
                 mText = "Quit"
             };
 
@@ -64,6 +64,8 @@ namespace HorsesAndGun
                 optionsButton,
                 quitButton
             };
+
+            mLogo = content.Load<Texture2D>("main_logo");
         }
 
         public override void OnActivate()
@@ -90,6 +92,11 @@ namespace HorsesAndGun
             {
                 button.Draw(info);
             }
+
+            Vector2 logoPos = new Vector2(SCREEN_WIDTH / 2.0f, 17.0f);
+            logoPos.X -= mLogo.Width / 2.0f;
+
+            info.spriteBatch.Draw(mLogo, logoPos, Color.White);
 
             info.spriteBatch.End();
 

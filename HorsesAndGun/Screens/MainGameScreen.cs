@@ -78,11 +78,13 @@ namespace HorsesAndGun
         {
             mDiceQueue = new DiceQueue();
             EntityManager.I.ClearEntities();
-            mGunReloadTimer.FullReset();
+            
             mGunReloadTime = 3000.0f;
             mGunLane = 0;
             mGameOverPoints = null;
 
+            mGunReloadTimer.FullReset();
+            mGameOverFadeTimer.FullReset();
             mReadyTimer.FullReset();
             mReadyTimer.Start();
 
