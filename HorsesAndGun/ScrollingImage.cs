@@ -40,8 +40,8 @@ namespace HorsesAndGun
 
         public void Update(GameTime gameTime)
         {
-            mTexture1Bounds.X -= (int)(mScrollSpeed * Util.GetDeltaT(gameTime));
-            mTexture2Bounds.X -= (int)(mScrollSpeed * Util.GetDeltaT(gameTime));
+            mTexture1Bounds.X -= (int)(mScrollSpeed * Util.GetDeltaT(gameTime) / 10.0f);
+            mTexture2Bounds.X -= (int)(mScrollSpeed * Util.GetDeltaT(gameTime) / 10.0f);
             ScrollImages();
         }
 

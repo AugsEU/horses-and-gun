@@ -18,6 +18,8 @@ namespace HorsesAndGun
         Texture2D[] mDiceTextures;
         Texture2D[] mSideDiceTextures;
         ScrollingImage mTopSky;
+        ScrollingImage mTopSkyCloud1;
+        ScrollingImage mTopSkyCloud2;
         ScrollingImage mGround;
 
         //Gun
@@ -71,8 +73,10 @@ namespace HorsesAndGun
             mGunBarrelTexture = content.Load<Texture2D>("gun_barrel");
             mGameOverCross = content.Load<Texture2D>("dead_x");
 
-            mTopSky = new ScrollingImage(content.Load<Texture2D>("sky_1"), content.Load<Texture2D>("sky_2"), Vector2.Zero, 10);
-            mGround = new ScrollingImage(content.Load<Texture2D>("ground"), content.Load<Texture2D>("ground"), new Vector2(84.0f, 27.0f), 20);
+            mTopSky = new ScrollingImage(content.Load<Texture2D>("sky_1"), content.Load<Texture2D>("sky_2"), Vector2.Zero, 70);
+            mTopSkyCloud1 = new ScrollingImage(content.Load<Texture2D>("dust_cloud_1"), content.Load<Texture2D>("dust_cloud_1"), Vector2.Zero, 130);
+            mTopSkyCloud2 = new ScrollingImage(content.Load<Texture2D>("dust_cloud_2"), content.Load<Texture2D>("dust_cloud_2"), Vector2.Zero, 65);
+            mGround = new ScrollingImage(content.Load<Texture2D>("ground"), content.Load<Texture2D>("ground"), new Vector2(84.0f, 27.0f), 200);
 
             mDiceTextures[0] = content.Load<Texture2D>("Dice1");
             mDiceTextures[1] = content.Load<Texture2D>("Dice2");
@@ -183,6 +187,8 @@ namespace HorsesAndGun
             //Normal update
             //Scrolling images
             mTopSky.Update(gameTime);
+            mTopSkyCloud1.Update(gameTime);
+            mTopSkyCloud2.Update(gameTime);
             mGround.Update(gameTime);
 
             //Score
@@ -290,6 +296,8 @@ namespace HorsesAndGun
 
             //Draw score
             mTopSky.Draw(info);
+            mTopSkyCloud1.Draw(info);
+            mTopSkyCloud2.Draw(info);
             string scoreStr = "Score: " + ScoreManager.I.GetCurrentScore() + "    High score:" + ScoreManager.I.GetHighScore();
             Util.DrawStringCentred(info.spriteBatch, pixelFont, new Vector2(SCREEN_WIDTH / 2.0f + 1.0f, 15.0f + 1.0f), new Color(50, 25, 0), scoreStr);
             Util.DrawStringCentred(info.spriteBatch, pixelFont, new Vector2(SCREEN_WIDTH / 2.0f, 15.0f), Color.SaddleBrown, scoreStr);
