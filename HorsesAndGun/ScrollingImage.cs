@@ -28,11 +28,11 @@ namespace HorsesAndGun
 
         private void ScrollImages()
         {
-            if (mTexture1Bounds.X + mTexture1Bounds.Width <= 0)
+            if (mTexture1Bounds.X + mTexture1Bounds.Width <= mPosition.X)
             {
                 mTexture1Bounds.X = mTexture2Bounds.X + mTexture2Bounds.Width;
             }
-            if (mTexture2Bounds.X + mTexture2Bounds.Width <= 0)
+            if (mTexture2Bounds.X + mTexture2Bounds.Width <= mPosition.X)
             {
                 mTexture2Bounds.X = mTexture1Bounds.X + mTexture1Bounds.Width;
             }

@@ -18,6 +18,7 @@ namespace HorsesAndGun
         Texture2D[] mDiceTextures;
         Texture2D[] mSideDiceTextures;
         ScrollingImage mTopSky;
+        ScrollingImage mGround;
 
         //Gun
         int mGunLane;
@@ -70,7 +71,8 @@ namespace HorsesAndGun
             mGunBarrelTexture = content.Load<Texture2D>("gun_barrel");
             mGameOverCross = content.Load<Texture2D>("dead_x");
 
-            mTopSky = new ScrollingImage(content.Load<Texture2D>("sky_1"), content.Load<Texture2D>("sky_2"), Vector2.Zero, 20);
+            mTopSky = new ScrollingImage(content.Load<Texture2D>("sky_1"), content.Load<Texture2D>("sky_2"), Vector2.Zero, 10);
+            mGround = new ScrollingImage(content.Load<Texture2D>("ground"), content.Load<Texture2D>("ground"), new Vector2(84.0f, 27.0f), 20);
 
             mDiceTextures[0] = content.Load<Texture2D>("Dice1");
             mDiceTextures[1] = content.Load<Texture2D>("Dice2");
@@ -181,6 +183,7 @@ namespace HorsesAndGun
             //Normal update
             //Scrolling images
             mTopSky.Update(gameTime);
+            mGround.Update(gameTime);
 
             //Score
             if (mScoreTimer.IsPlaying() == false)
@@ -280,6 +283,8 @@ namespace HorsesAndGun
                                     SamplerState.PointClamp,
                                     DepthStencilState.None,
                                     RasterizerState.CullNone);
+
+            mGround.Draw(info);
 
             info.spriteBatch.Draw(mBackground, Vector2.Zero, Color.White);
 
