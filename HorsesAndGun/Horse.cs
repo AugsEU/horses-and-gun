@@ -129,7 +129,7 @@ namespace HorsesAndGun
         {
             Texture2D texture = mIdleAnim.GetCurrentTexture();
 
-            if(mCurrentOrder.type != HorseOrderType.none || mOrderQueue.Count > 0)
+            //if(mCurrentOrder.type != HorseOrderType.none || mOrderQueue.Count > 0)
             {
                 texture = mRunAnim.GetCurrentTexture();
             }

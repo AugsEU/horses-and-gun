@@ -34,10 +34,15 @@ namespace HorsesAndGun
         MonoTimer mReadyTimer;
         const double mReadyTime = 2000.0;
 
+        //Score
+        MonoTimer mScoreTimer;
+        bool mNewHighScore;
+
         //Game over
         List<Vector2> mGameOverPoints;
         MonoTimer mGameOverFadeTimer;
         const double mGameOverFadeTime = 2400.0;
+
 
 
         public MainGameScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
@@ -49,6 +54,7 @@ namespace HorsesAndGun
             mShootAnim = new Animator(Animator.PlayType.OneShot);
             mGameOverFadeTimer = new MonoTimer();
             mReadyTimer = new MonoTimer();
+            mScoreTimer = new MonoTimer();
             mGunLane = 0;
         }
 
@@ -76,6 +82,10 @@ namespace HorsesAndGun
 
         public override void OnActivate()
         {
+            mNewHighScore = false;
+            ScoreManager.I.ResetScore();
+            mScoreTimer.FullReset();
+
             SoundManager.I.PlayMusic(SoundManager.MusicType.MainGame, 0.5f);
             mDiceQueue = new DiceQueue();
             EntityManager.I.ClearEntities();
@@ -104,6 +114,7 @@ namespace HorsesAndGun
 
         public override void Update(GameTime gameTime)
         {
+            //Ready...
             if(mReadyTimer.IsPlaying())
             {
                 if(mReadyTimer.GetElapsedMs() > mReadyTime)
@@ -123,6 +134,7 @@ namespace HorsesAndGun
                 {
                     SoundManager.I.StopMusic();
                     SoundManager.I.PlaySFX(SoundManager.SFXType.GameOver, 0.5f);
+                    mNewHighScore = ScoreManager.I.CheckHighScore();
                     mGameOverFadeTimer.Start();
                     mGunReloadTimer.Stop();
                 }
@@ -135,6 +147,19 @@ namespace HorsesAndGun
                     }
                 }
                 return;
+            }
+
+            //Normal update
+            //Score
+            if (mScoreTimer.IsPlaying() == false)
+            {
+                mScoreTimer.Start();
+            }
+
+            if (mScoreTimer.GetElapsedMs() > 1000.0)
+            {
+                ScoreManager.I.AddCurrentScore(5);
+                mScoreTimer.FullReset();
             }
 
             mShootAnim.Update(gameTime);
@@ -211,6 +236,8 @@ namespace HorsesAndGun
 
         public override RenderTarget2D DrawToRenderTarget(DrawInfo info)
         {
+            SpriteFont pixelFont = FontManager.I.GetFont("Pixica Micro-24");
+
             //Draw out the game area
             info.device.SetRenderTarget(mScreenTarget);
             info.device.Clear(Color.SaddleBrown);
@@ -222,6 +249,9 @@ namespace HorsesAndGun
                                     RasterizerState.CullNone);
 
             info.spriteBatch.Draw(mBackground, Vector2.Zero, Color.White);
+
+            //Draw score
+            Util.DrawStringCentred(info.spriteBatch, pixelFont, new Vector2(SCREEN_WIDTH / 2.0f, 15.0f), Color.Wheat, "Score: " + ScoreManager.I.GetCurrentScore() + "    High score:" + ScoreManager.I.GetHighScore());
 
             mTrackManager.Draw(info);
             EntityManager.I.Draw(info);
@@ -276,13 +306,24 @@ namespace HorsesAndGun
 
             Util.DrawStringCentred(info.spriteBatch, pixelFont, centre + new Vector2(0.0f, -130.0f), textColor, "GAME OVER!");
 
-            Util.DrawStringCentred(info.spriteBatch, pixelFont, centre , textColor, "Score: ");
-            Util.DrawStringCentred(info.spriteBatch, pixelFont, centre + new Vector2(0.0f, 30.0f), textColor, "High score: ");
+            Util.DrawStringCentred(info.spriteBatch, pixelFont, centre , textColor, "Score: " + ScoreManager.I.GetCurrentScore());
 
             if (falpha == 1.0f)
             {
                 Util.DrawStringCentred(info.spriteBatch, smallPixelFont, centre + new Vector2(0.0f, 130.0f), textColor, "Click to continue...");
             }
+
+            if (mNewHighScore)
+            {
+                textColor = new Color(Color.Salmon, falpha);
+                Util.DrawStringCentred(info.spriteBatch, pixelFont, centre + new Vector2(0.0f, 30.0f), textColor, "New high score: " + ScoreManager.I.GetHighScore() + "!");
+            }
+            else
+            {
+                Util.DrawStringCentred(info.spriteBatch, pixelFont, centre + new Vector2(0.0f, 30.0f), textColor, "High score: " + ScoreManager.I.GetHighScore());
+            }
+
+
         }
 
         private void DrawGun(DrawInfo info)
