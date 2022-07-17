@@ -119,7 +119,7 @@ namespace HorsesAndGun
                 mTotalTimer.Start();
             }
 
-            mFallTime = START_FALL_TIME - mTotalTimer.GetElapsedMs() / 100.0;
+            mFallTime = START_FALL_TIME - mTotalTimer.GetElapsedMs() / 95.0;
             mFallTime = Math.Clamp(mFallTime, END_FALL_TIME, START_FALL_TIME);
 
             if (mFallingTimer.IsPlaying())
@@ -374,7 +374,7 @@ namespace HorsesAndGun
 
 
             //Fast reload
-            if (RandomManager.I.GetRandBool(50))
+            if (RandomManager.I.GetRandBool(40))
             {
                 bool forReal = true;
                 switch (trackNum)

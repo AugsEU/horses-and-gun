@@ -39,19 +39,19 @@ namespace HorsesAndGun
 
         public override void LoadContent(ContentManager content)
         {
-            Button playButton = new Button(content.Load<Texture2D>("temp_button"), content.Load<SpriteFont>("Fonts/Pixica"))
+            Button playButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
             {
                 mPosition = new Vector2(196.5f, 160.0f),
                 mText = "Play"
             };
 
-            Button optionsButton = new Button(content.Load<Texture2D>("temp_button"), content.Load<SpriteFont>("Fonts/Pixica"))
+            Button optionsButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
             {
                 mPosition = new Vector2(196.5f, 220.0f),
-                mText = "Options"
+                mText = "Help"
             };
 
-            Button quitButton = new Button(content.Load<Texture2D>("temp_button"), content.Load<SpriteFont>("Fonts/Pixica"))
+            Button quitButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
             {
                 mPosition = new Vector2(196.5f, 280.0f),
                 mText = "Quit"
@@ -86,7 +86,7 @@ namespace HorsesAndGun
         {
             //Draw out the game area
             info.device.SetRenderTarget(mScreenTarget);
-            info.device.Clear(Color.SaddleBrown);
+            info.device.Clear(new Color(211, 145, 65));
 
             info.spriteBatch.Begin(SpriteSortMode.Immediate,
                                     BlendState.AlphaBlend,
