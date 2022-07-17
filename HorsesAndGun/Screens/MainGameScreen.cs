@@ -83,13 +83,18 @@ namespace HorsesAndGun
             mSideDiceTextures[4] = content.Load<Texture2D>("dice_side_5");
             mSideDiceTextures[5] = content.Load<Texture2D>("dice_side_6");
 
-            mShootAnim.LoadFrame(content, "gun-fire1", 0.04f);
+            mShootAnim.LoadFrame(content, "gun-fire1", 0.05f);
             mShootAnim.LoadFrame(content, "gun-fire2", 0.05f);
-            mShootAnim.LoadFrame(content, "gun-fire3", 0.07f);
-            mShootAnim.LoadFrame(content, "gun-fire4", 0.55f);
-            mShootAnim.LoadFrame(content, "gun-fire5", 0.35f);
-            mShootAnim.LoadFrame(content, "gun-fire6", 0.35f);
-            mShootAnim.LoadFrame(content, "gun-fire7", 0.05f);
+            mShootAnim.LoadFrame(content, "gun-fire3", 0.05f);
+            mShootAnim.LoadFrame(content, "gun-fire4", 0.07f);
+            mShootAnim.LoadFrame(content, "gun-fire5", 0.07f);
+            mShootAnim.LoadFrame(content, "gun-fire6", 0.07f);
+            mShootAnim.LoadFrame(content, "gun-fire7", 0.07f);
+            mShootAnim.LoadFrame(content, "gun-fire8", 0.07f);
+            mShootAnim.LoadFrame(content, "gun-fire9", 0.07f);
+            mShootAnim.LoadFrame(content, "gun-fire10", 0.07f);
+            mShootAnim.LoadFrame(content, "gun", 0.05f);
+
         }
 
         public override void OnActivate()

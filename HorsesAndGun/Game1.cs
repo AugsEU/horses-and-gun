@@ -20,6 +20,8 @@ namespace HorsesAndGun
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        Texture2D mCursor;
+
         public Game1()
         {
             self = this;
@@ -40,6 +42,8 @@ namespace HorsesAndGun
             _graphics.PreferredBackBufferHeight = Screen.SCREEN_HEIGHT;
             _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
+
+            IsMouseVisible = false;
 
             Window.AllowUserResizing = true;
 
@@ -64,6 +68,8 @@ namespace HorsesAndGun
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            mCursor = Content.Load<Texture2D>("cursor");
 
             SoundManager.I.LoadContent(this.Content);
             ScreenManager.I.LoadAllScreens(this.Content, _graphics);
@@ -122,8 +128,15 @@ namespace HorsesAndGun
                                     DepthStencilState.None,
                                     RasterizerState.CullNone);
                 DrawScreenPixelPerfect(frameInfo, screenTargetRef);
+
+                MouseState mouseState = Mouse.GetState();
+                Vector2 mouseScreenPoint = new Vector2(mouseState.Position.X - mCursor.Width/2.0f, mouseState.Position.Y - mCursor.Height / 2.0f);
+
+                _spriteBatch.Draw(mCursor, mouseScreenPoint, Color.White);
+
                 _spriteBatch.End();
             }
+
 
             base.Draw(gameTime);
         }
