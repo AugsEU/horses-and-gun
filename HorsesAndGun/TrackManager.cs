@@ -22,7 +22,8 @@ namespace HorsesAndGun
 
         Vector2 mDynamicOffset = new Vector2(0.0f, 0.0f);
 
-        const double START_FALL_TIME = 1500.0;
+        const double START_FALL_TIME = 2500.0;
+        const double END_FALL_TIME = 200.0;
 
         TrackTile[,] mTiles;
         ContentManager mContentManager;
@@ -33,8 +34,10 @@ namespace HorsesAndGun
         double mFallTime = START_FALL_TIME;
         MonoTimer mFallingTimer;
 
-        double mShiftTime = 1000.0;
+        double mShiftTime = END_FALL_TIME;
         MonoTimer mShiftTimer;
+
+        MonoTimer mTotalTimer;
 
         public TrackManager(ContentManager _ContentManager)
         {
@@ -45,7 +48,7 @@ namespace HorsesAndGun
         {
             mDynamicOffset = new Vector2(0.0f, 0.0f);
             mFallTime = START_FALL_TIME;
-            mShiftTime = START_FALL_TIME;
+            mShiftTime = 1000.0;
 
             mTiles = new TrackTile[NUM_TRACKS, NUM_TILES_PER_TRACK];
             mHorses = new Horse[NUM_HORSES];
@@ -53,6 +56,7 @@ namespace HorsesAndGun
             //Timings
             mFallingTimer = new MonoTimer();
             mShiftTimer = new MonoTimer();
+            mTotalTimer = new MonoTimer();
 
             mFallTime = START_FALL_TIME;
             mFallingTimer.FullReset();
@@ -94,14 +98,22 @@ namespace HorsesAndGun
         public void Update(GameTime gameTime)
         {
             //Shift logic
-            if(mFallingTimer.IsPlaying())
+            if (mTotalTimer.IsPlaying() == false)
+            {
+                mTotalTimer.Start();
+            }
+
+            mFallTime = START_FALL_TIME - mTotalTimer.GetElapsedMs() / 110.0;
+            mFallTime = Math.Clamp(mFallTime, END_FALL_TIME, START_FALL_TIME);
+
+            if (mFallingTimer.IsPlaying())
             {
                 if (mFallingTimer.GetElapsedMs() > mFallTime)
                 {
                     BeginShift(gameTime);
                 }
             }
-            else
+            else if(!mShiftTimer.IsPlaying())
             {
                 mFallingTimer.Start();
             }
