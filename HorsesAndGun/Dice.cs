@@ -39,7 +39,10 @@ namespace HorsesAndGun
 
         public void Roll()
         {
-            mValue = RandomManager.I.GetIntInRange(1, 6);
+            int Rand1 = RandomManager.I.GetIntInRange(1, 6);
+            int Rand2 = RandomManager.I.GetIntInRange(1, 6);
+
+            mValue = Math.Min(Rand1, Rand2);
         }
     }
 }
