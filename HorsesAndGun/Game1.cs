@@ -65,6 +65,7 @@ namespace HorsesAndGun
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            SoundManager.I.LoadContent(this.Content);
             ScreenManager.I.LoadAllScreens(this.Content, _graphics);
             FontManager.I.LoadAllFonts(this.Content);
 

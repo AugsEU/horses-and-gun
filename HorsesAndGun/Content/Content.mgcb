@@ -411,6 +411,42 @@
 /processorParam:TextureFormat=Color
 /build:main_logo.png
 
+#begin Music/Horses and gun.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/Horses and gun.wav
+
+#begin SFX/GameOverSFX.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SFX/GameOverSFX.wav
+
+#begin SFX/getherdone.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SFX/getherdone.wav
+
+#begin SFX/gunsfx.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SFX/gunsfx.wav
+
+#begin SFX/levelupsfx.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SFX/levelupsfx.wav
+
+#begin SFX/reloadsfx.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SFX/reloadsfx.wav
+
 #begin temp_button.png
 /importer:TextureImporter
 /processor:TextureProcessor

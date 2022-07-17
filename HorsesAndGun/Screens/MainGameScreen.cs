@@ -76,6 +76,7 @@ namespace HorsesAndGun
 
         public override void OnActivate()
         {
+            SoundManager.I.PlayMusic(SoundManager.MusicType.MainGame, 0.5f);
             mDiceQueue = new DiceQueue();
             EntityManager.I.ClearEntities();
             
@@ -120,6 +121,8 @@ namespace HorsesAndGun
             {
                 if(mGameOverFadeTimer.IsPlaying() == false)
                 {
+                    SoundManager.I.StopMusic();
+                    SoundManager.I.PlaySFX(SoundManager.SFXType.GameOver, 0.5f);
                     mGameOverFadeTimer.Start();
                     mGunReloadTimer.Stop();
                 }
@@ -140,6 +143,8 @@ namespace HorsesAndGun
             if (mGunReloadTimer.GetElapsedMs() >= mGunReloadTime)
             {
                 mGunReloadTimer.Stop();
+                mGunReloadTimer.FullReset();
+                SoundManager.I.PlaySFX(SoundManager.SFXType.GunReload, 0.35f);
             }
 
             mTrackManager.Update(gameTime);
@@ -160,6 +165,7 @@ namespace HorsesAndGun
 
         private void FireGun(GameTime gameTime)
         {
+            SoundManager.I.PlaySFX(SoundManager.SFXType.GunShoot, 0.2f);
             //Shoot dice
             Dice diceToShoot = mDiceQueue.PopDice();
             Texture2D diceTex = GetDiceTexture(diceToShoot);

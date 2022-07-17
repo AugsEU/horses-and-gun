@@ -13,9 +13,13 @@ namespace HorsesAndGun
         private List<Button> mButtonList;
         Texture2D mLogo;
 
+        MonoTimer mStartGameTimer;
+        const double mWaitTime = 2000.0;
+
         private void PlayButtonClick(object sender, EventArgs e)
         {
-            ScreenManager.I.ActivateScreen(ScreenType.MainGame);
+            mStartGameTimer.Start();
+            SoundManager.I.PlaySFX(SoundManager.SFXType.GetHerDone, 0.5f);
         }
 
         private void OptionsButtonClick(object sender, EventArgs e)
@@ -30,6 +34,7 @@ namespace HorsesAndGun
 
         public RossButtonsScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
         {
+            mStartGameTimer = new MonoTimer();
         }
 
         public override void LoadContent(ContentManager content)
@@ -70,6 +75,7 @@ namespace HorsesAndGun
 
         public override void OnActivate()
         {
+            mStartGameTimer.FullReset();
         }
 
         public override void OnDeactivate()
@@ -105,6 +111,16 @@ namespace HorsesAndGun
 
         public override void Update(GameTime gameTime)
         {
+            if(mStartGameTimer.IsPlaying())
+            {
+                if (mStartGameTimer.GetElapsedMs() > mWaitTime)
+                {
+                    mStartGameTimer.FullReset();
+                    ScreenManager.I.ActivateScreen(ScreenType.MainGame);
+                }
+                return;
+            }
+
             foreach (Button button in mButtonList)
             {
                 button.Update();
