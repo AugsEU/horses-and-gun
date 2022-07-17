@@ -38,10 +38,10 @@ namespace HorsesAndGun
             }
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
-            mTexture1Bounds.X -= mScrollSpeed;
-            mTexture2Bounds.X -= mScrollSpeed;
+            mTexture1Bounds.X -= (int)(mScrollSpeed * Util.GetDeltaT(gameTime));
+            mTexture2Bounds.X -= (int)(mScrollSpeed * Util.GetDeltaT(gameTime));
             ScrollImages();
         }
 

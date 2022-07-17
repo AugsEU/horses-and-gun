@@ -22,7 +22,7 @@ namespace HorsesAndGun
 
         Vector2 mDynamicOffset = new Vector2(0.0f, 0.0f);
 
-        const double START_FALL_TIME = 2500.0;
+        const double START_FALL_TIME = 3500.0;
         const double END_FALL_TIME = 200.0;
 
         TrackTile[,] mTiles;
@@ -70,7 +70,9 @@ namespace HorsesAndGun
                 }
             }
 
-            for(int horse = 0; horse < NUM_HORSES; horse++)
+            RemoveDoubleDeath();
+
+            for (int horse = 0; horse < NUM_HORSES; horse++)
             {
                 mHorses[horse] = new Horse(Vector2.Zero, 5, NUM_TRACKS - horse - 1);
                 mTiles[NUM_TRACKS - horse - 1, 5] = new BasicTile(mContentManager);
@@ -78,6 +80,20 @@ namespace HorsesAndGun
             }
 
             SetHorsePositions();
+        }
+
+        private void RemoveDoubleDeath()
+        {
+            for (int track = 0; track < NUM_TRACKS; track++)
+            {
+                for (int tile = 1; tile < NUM_TILES_PER_TRACK; tile++)
+                {
+                    if(mTiles[track, tile] is DeathTile && mTiles[track, tile - 1] is DeathTile)
+                    {
+                        mTiles[track, tile] = new BasicTile(mContentManager);
+                    }
+                }
+            }
         }
 
         public List<Vector2> GetGameOverPoints()
@@ -103,7 +119,7 @@ namespace HorsesAndGun
                 mTotalTimer.Start();
             }
 
-            mFallTime = START_FALL_TIME - mTotalTimer.GetElapsedMs() / 110.0;
+            mFallTime = START_FALL_TIME - mTotalTimer.GetElapsedMs() / 100.0;
             mFallTime = Math.Clamp(mFallTime, END_FALL_TIME, START_FALL_TIME);
 
             if (mFallingTimer.IsPlaying())
@@ -172,6 +188,8 @@ namespace HorsesAndGun
                     horse.Kill();
                 }
             }
+
+            RemoveDoubleDeath();
 
             mDynamicOffset = TILE_OFFSET;
         }
@@ -338,7 +356,8 @@ namespace HorsesAndGun
                 return new PlusTile(mContentManager, moveAmount);
             }
 
-            if (RandomManager.I.GetRandBool(30))
+            //Up down
+            if (RandomManager.I.GetRandBool(35))
             {
                 bool goUp = true;
                 switch (trackNum)
@@ -353,7 +372,46 @@ namespace HorsesAndGun
                 return new UpDownTile(mContentManager, goUp);
             }
 
-            return new BasicTile(mContentManager);
+
+            //Fast reload
+            if (RandomManager.I.GetRandBool(50))
+            {
+                bool forReal = true;
+                switch (trackNum)
+                {
+                    case 0: forReal = true; break;
+                    case 1: forReal = RandomManager.I.GetRandBool(95); break;
+                    case 2: forReal = RandomManager.I.GetRandBool(80); break;
+                    case 3: forReal = RandomManager.I.GetRandBool(70); break;
+                    case 4: forReal = RandomManager.I.GetRandBool(60); break;
+                }
+
+                if (forReal)
+                {
+                    return new FastReloadTile(mContentManager);
+                }
+            }
+
+            //Death
+            if (RandomManager.I.GetRandBool(50))
+            {
+                bool forReal = true;
+                switch (trackNum)
+                {
+                    case 0: forReal = RandomManager.I.GetRandBool(40); break;
+                    case 1: forReal = RandomManager.I.GetRandBool(50); break;
+                    case 2: forReal = RandomManager.I.GetRandBool(60); break;
+                    case 3: forReal = RandomManager.I.GetRandBool(90); break;
+                    case 4: forReal = true; break;
+                }
+
+                if (forReal)
+                {
+                    return new DeathTile(mContentManager);
+                }
+            }
+
+                return new BasicTile(mContentManager);
         }
 
 

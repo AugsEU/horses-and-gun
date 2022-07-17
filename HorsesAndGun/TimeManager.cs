@@ -11,6 +11,7 @@ namespace HorsesAndGun
     {
         bool mPlaying;
         double mElapsedTimeMs;
+        double mTimeSpeed;
 
         public MonoTimer()
         {
@@ -18,6 +19,7 @@ namespace HorsesAndGun
 
             mElapsedTimeMs = 0.0;
             mPlaying = false;
+            mTimeSpeed = 1.0;
         }
 
         ~MonoTimer()
@@ -39,7 +41,7 @@ namespace HorsesAndGun
         {
             if (mPlaying)
             {
-                mElapsedTimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                mElapsedTimeMs += gameTime.ElapsedGameTime.TotalMilliseconds * mTimeSpeed;
             }
         }
 
@@ -57,11 +59,17 @@ namespace HorsesAndGun
         {
             mPlaying = false;
             mElapsedTimeMs = 0.0;
+            mTimeSpeed = 1.0;
         }
 
         public bool IsPlaying()
         {
             return mPlaying;
+        }
+
+        public void SetTimeSpeed(double timeSpeed)
+        {
+            mTimeSpeed = timeSpeed;
         }
     }
 

@@ -17,6 +17,7 @@ namespace HorsesAndGun
         Texture2D mGameOverCross;
         Texture2D[] mDiceTextures;
         Texture2D[] mSideDiceTextures;
+        ScrollingImage mTopSky;
 
         //Gun
         int mGunLane;
@@ -25,6 +26,7 @@ namespace HorsesAndGun
         Animator mShootAnim;
         MonoTimer mGunReloadTimer;
         double mGunReloadTime;
+        const double NORMAL_RELOAD_TIME = 3000.0;
 
         //Dice
         DiceQueue mDiceQueue;
@@ -68,6 +70,8 @@ namespace HorsesAndGun
             mGunBarrelTexture = content.Load<Texture2D>("gun_barrel");
             mGameOverCross = content.Load<Texture2D>("dead_x");
 
+            mTopSky = new ScrollingImage(content.Load<Texture2D>("sky_1"), content.Load<Texture2D>("sky_2"), Vector2.Zero, 20);
+
             mDiceTextures[0] = content.Load<Texture2D>("Dice1");
             mDiceTextures[1] = content.Load<Texture2D>("Dice2");
             mDiceTextures[2] = content.Load<Texture2D>("Dice3");
@@ -107,7 +111,7 @@ namespace HorsesAndGun
             mDiceQueue = new DiceQueue();
             EntityManager.I.ClearEntities();
             
-            mGunReloadTime = 3000.0;
+            mGunReloadTime = NORMAL_RELOAD_TIME;
             mGunLane = 0;
             mGameOverPoints = null;
 
@@ -127,6 +131,14 @@ namespace HorsesAndGun
         private bool IsGameOver()
         {
             return mGameOverPoints != null && mGameOverPoints.Count > 0;
+        }
+
+        public void FastReload()
+        {
+            if(mGunReloadTimer.IsPlaying())
+            {
+                mGunReloadTimer.SetTimeSpeed(9.0);
+            }
         }
 
         public override void Update(GameTime gameTime)
@@ -167,6 +179,9 @@ namespace HorsesAndGun
             }
 
             //Normal update
+            //Scrolling images
+            mTopSky.Update(gameTime);
+
             //Score
             if (mScoreTimer.IsPlaying() == false)
             {
@@ -187,6 +202,7 @@ namespace HorsesAndGun
                 mGunReloadTimer.Stop();
                 mGunReloadTimer.FullReset();
                 SoundManager.I.PlaySFX(SoundManager.SFXType.GunReload, 0.35f);
+                mGunReloadTime = NORMAL_RELOAD_TIME;
             }
 
             mTrackManager.Update(gameTime);
@@ -268,7 +284,11 @@ namespace HorsesAndGun
             info.spriteBatch.Draw(mBackground, Vector2.Zero, Color.White);
 
             //Draw score
-            Util.DrawStringCentred(info.spriteBatch, pixelFont, new Vector2(SCREEN_WIDTH / 2.0f, 15.0f), Color.Wheat, "Score: " + ScoreManager.I.GetCurrentScore() + "    High score:" + ScoreManager.I.GetHighScore());
+            mTopSky.Draw(info);
+            string scoreStr = "Score: " + ScoreManager.I.GetCurrentScore() + "    High score:" + ScoreManager.I.GetHighScore();
+            Util.DrawStringCentred(info.spriteBatch, pixelFont, new Vector2(SCREEN_WIDTH / 2.0f + 1.0f, 15.0f + 1.0f), new Color(50, 25, 0), scoreStr);
+            Util.DrawStringCentred(info.spriteBatch, pixelFont, new Vector2(SCREEN_WIDTH / 2.0f, 15.0f), Color.SaddleBrown, scoreStr);
+
 
             mTrackManager.Draw(info);
             EntityManager.I.Draw(info);
