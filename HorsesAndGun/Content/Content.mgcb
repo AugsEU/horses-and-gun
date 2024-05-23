@@ -747,11 +747,11 @@
 /processorParam:TextureFormat=Color
 /build:menu_background.png
 
-#begin Music/Horses and gun.wav
-/importer:WavImporter
+#begin Music/Horses and gun.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:Music/Horses and gun.wav
+/build:Music/Horses and gun.ogg
 
 #begin SFX/GameOverSFX.wav
 /importer:WavImporter
