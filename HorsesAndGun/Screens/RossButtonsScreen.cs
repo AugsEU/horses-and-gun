@@ -1,131 +1,133 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
 
 namespace HorsesAndGun
 {
-    internal class RossButtonsScreen : Screen
-    {
-        private List<Button> mButtonList;
-        Texture2D mLogo;
+	internal class RossButtonsScreen : Screen
+	{
+		private List<Button> mButtonList;
+		Texture2D mLogo;
+		ScrollingImage mGround;
 
-        MonoTimer mStartGameTimer;
-        const double mWaitTime = 2000.0;
+		MonoTimer mStartGameTimer;
+		const double mWaitTime = 2000.0;
 
-        private void PlayButtonClick(object sender, EventArgs e)
-        {
-            mStartGameTimer.Start();
-            SoundManager.I.PlaySFX(SoundManager.SFXType.GetHerDone, 0.5f);
-        }
+		private void PlayButtonClick(object sender, EventArgs e)
+		{
+			mStartGameTimer.Start();
+			SoundManager.I.PlaySFX(SoundManager.SFXType.GetHerDone, 0.5f);
+		}
 
-        private void OptionsButtonClick(object sender, EventArgs e)
-        {
-            ScreenManager.I.ActivateScreen(ScreenType.Options);
-        }
+		private void OptionsButtonClick(object sender, EventArgs e)
+		{
+			ScreenManager.I.ActivateScreen(ScreenType.Options);
+		}
 
-        private void QuitButtonClick(object sender, EventArgs e)
-        {
-            Game1.self.Exit();
-        }
+		private void QuitButtonClick(object sender, EventArgs e)
+		{
+			Game1.self.Exit();
+		}
 
-        public RossButtonsScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
-        {
-            mStartGameTimer = new MonoTimer();
-        }
+		public RossButtonsScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
+		{
+			mStartGameTimer = new MonoTimer();
+		}
 
-        public override void LoadContent(ContentManager content)
-        {
-            Button playButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
-            {
-                mPosition = new Vector2(196.5f, 160.0f),
-                mText = "Play"
-            };
+		public override void LoadContent(ContentManager content)
+		{
+			Button playButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
+			{
+				mPosition = new Vector2(196.5f, 160.0f),
+				mText = "Play"
+			};
 
-            Button optionsButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
-            {
-                mPosition = new Vector2(196.5f, 220.0f),
-                mText = "Help"
-            };
+			Button optionsButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
+			{
+				mPosition = new Vector2(196.5f, 220.0f),
+				mText = "Help"
+			};
 
-            Button quitButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
-            {
-                mPosition = new Vector2(196.5f, 280.0f),
-                mText = "Quit"
-            };
+			Button quitButton = new Button(content.Load<Texture2D>("wooden_button"), content.Load<SpriteFont>("Fonts/Pixica"))
+			{
+				mPosition = new Vector2(196.5f, 280.0f),
+				mText = "Quit"
+			};
 
-
-            playButton.mOnMouseClick += PlayButtonClick;
-            optionsButton.mOnMouseClick += OptionsButtonClick;
-            quitButton.mOnMouseClick += QuitButtonClick;
+			mGround = new ScrollingImage(content.Load<Texture2D>("menu_background"), content.Load<Texture2D>("menu_background"), Vector2.Zero, 200);
 
 
-            mButtonList = new List<Button>()
-            {
-                playButton,
-                optionsButton,
-                quitButton
-            };
+			playButton.mOnMouseClick += PlayButtonClick;
+			optionsButton.mOnMouseClick += OptionsButtonClick;
+			quitButton.mOnMouseClick += QuitButtonClick;
 
-            mLogo = content.Load<Texture2D>("main_logo");
-        }
 
-        public override void OnActivate()
-        {
-            mStartGameTimer.FullReset();
-        }
+			mButtonList = new List<Button>()
+			{
+				playButton,
+				optionsButton,
+				quitButton
+			};
 
-        public override void OnDeactivate()
-        {
-        }
+			mLogo = content.Load<Texture2D>("main_logo");
+		}
 
-        public override RenderTarget2D DrawToRenderTarget(DrawInfo info)
-        {
-            //Draw out the game area
-            info.device.SetRenderTarget(mScreenTarget);
-            info.device.Clear(new Color(211, 145, 65));
+		public override void OnActivate()
+		{
+			mStartGameTimer.FullReset();
+		}
 
-            info.spriteBatch.Begin(SpriteSortMode.Immediate,
-                                    BlendState.AlphaBlend,
-                                    SamplerState.PointClamp,
-                                    DepthStencilState.None,
-                                    RasterizerState.CullNone);
+		public override void OnDeactivate()
+		{
+		}
 
-            foreach (Button button in mButtonList)
-            {
-                button.Draw(info);
-            }
+		public override RenderTarget2D DrawToRenderTarget(DrawInfo info)
+		{
+			//Draw out the game area
+			info.device.SetRenderTarget(mScreenTarget);
+			info.device.Clear(new Color(211, 145, 65));
 
-            Vector2 logoPos = new Vector2(SCREEN_WIDTH / 2.0f, 17.0f);
-            logoPos.X -= mLogo.Width / 2.0f;
+			info.spriteBatch.Begin(SpriteSortMode.Immediate,
+									BlendState.AlphaBlend,
+									SamplerState.PointClamp,
+									DepthStencilState.None,
+									RasterizerState.CullNone);
 
-            info.spriteBatch.Draw(mLogo, logoPos, Color.White);
+			mGround.Draw(info);
 
-            info.spriteBatch.End();
+			foreach (Button button in mButtonList)
+			{
+				button.Draw(info);
+			}
 
-            return mScreenTarget;
-        }
+			Vector2 logoPos = new Vector2(SCREEN_WIDTH / 2.0f, 17.0f);
+			logoPos.X -= mLogo.Width / 2.0f;
 
-        public override void Update(GameTime gameTime)
-        {
-            if(mStartGameTimer.IsPlaying())
-            {
-                if (mStartGameTimer.GetElapsedMs() > mWaitTime)
-                {
-                    mStartGameTimer.FullReset();
-                    ScreenManager.I.ActivateScreen(ScreenType.MainGame);
-                }
-                return;
-            }
+			info.spriteBatch.Draw(mLogo, logoPos, Color.White);
 
-            foreach (Button button in mButtonList)
-            {
-                button.Update();
-            }
-        }
+			info.spriteBatch.End();
 
-    }
+			return mScreenTarget;
+		}
+
+		public override void Update(GameTime gameTime)
+		{
+			mGround.Update(gameTime);
+
+			if (mStartGameTimer.IsPlaying())
+			{
+				if (mStartGameTimer.GetElapsedMs() > mWaitTime)
+				{
+					mStartGameTimer.FullReset();
+					ScreenManager.I.ActivateScreen(ScreenType.MainGame);
+				}
+				return;
+			}
+
+			foreach (Button button in mButtonList)
+			{
+				button.Update();
+			}
+		}
+
+	}
 }

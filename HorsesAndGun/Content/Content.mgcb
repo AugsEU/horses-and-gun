@@ -735,6 +735,18 @@
 /processorParam:TextureFormat=Color
 /build:main_logo.png
 
+#begin menu_background.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:menu_background.png
+
 #begin Music/Horses and gun.wav
 /importer:WavImporter
 /processor:SongProcessor

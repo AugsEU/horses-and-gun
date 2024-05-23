@@ -1,85 +1,78 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-
-namespace HorsesAndGun
+﻿namespace HorsesAndGun
 {
-    internal class InputManager : Singleton<InputManager>
-    {
-        KeyboardState mCurrentKeyState;
-        KeyboardState mPreviousKeyState;
+	internal class InputManager : Singleton<InputManager>
+	{
+		KeyboardState mCurrentKeyState;
+		KeyboardState mPreviousKeyState;
 
-        MouseState mPrevMouseState;
-        MouseState mMouseState;
+		MouseState mPrevMouseState;
+		MouseState mMouseState;
 
-        public void Update(GameTime gameTime)
-        {
-            mPreviousKeyState = mCurrentKeyState;
+		public void Update(GameTime gameTime)
+		{
+			mPreviousKeyState = mCurrentKeyState;
 
-            mCurrentKeyState = Keyboard.GetState();
+			mCurrentKeyState = Keyboard.GetState();
 
-            mPrevMouseState = mMouseState;
-            mMouseState = Mouse.GetState();
-        }
+			mPrevMouseState = mMouseState;
+			mMouseState = Mouse.GetState();
+		}
 
-        public bool AllKeysPressed(Keys[] keys)
-        {
-            foreach (Keys key in keys)
-            {
-                if (!KeyPressed(key))
-                {
-                    return false;
-                }
-            }
+		public bool AllKeysPressed(Keys[] keys)
+		{
+			foreach (Keys key in keys)
+			{
+				if (!KeyPressed(key))
+				{
+					return false;
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        public bool AnyKeysPressed(Keys[] keys)
-        {
-            foreach(Keys key in keys)
-            {
-                if(KeyPressed(key))
-                {
-                    return true;
-                }
-            }
+		public bool AnyKeysPressed(Keys[] keys)
+		{
+			foreach (Keys key in keys)
+			{
+				if (KeyPressed(key))
+				{
+					return true;
+				}
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        public bool KeyPressed(Keys key)
-        {
-            return mCurrentKeyState.IsKeyDown(key) && !mPreviousKeyState.IsKeyDown(key);
-        }
+		public bool KeyPressed(Keys key)
+		{
+			return mCurrentKeyState.IsKeyDown(key) && !mPreviousKeyState.IsKeyDown(key);
+		}
 
-        public bool LClick()
-        {
-            bool nowPress = mMouseState.LeftButton == ButtonState.Pressed;
-            bool prevPress = mPrevMouseState.LeftButton == ButtonState.Pressed;
+		public bool LClick()
+		{
+			bool nowPress = mMouseState.LeftButton == ButtonState.Pressed;
+			bool prevPress = mPrevMouseState.LeftButton == ButtonState.Pressed;
 
-            return nowPress && !prevPress;
-        }
+			return nowPress && !prevPress;
+		}
 
-        public bool RClick()
-        {
-            bool nowPress = mMouseState.RightButton == ButtonState.Pressed;
-            bool prevPress = mPrevMouseState.RightButton == ButtonState.Pressed;
+		public bool RClick()
+		{
+			bool nowPress = mMouseState.RightButton == ButtonState.Pressed;
+			bool prevPress = mPrevMouseState.RightButton == ButtonState.Pressed;
 
-            return nowPress && !prevPress;
-        }
+			return nowPress && !prevPress;
+		}
 
-        public Point GetMousePos()
-        {
-            Point screenPoint;
+		public Point GetMousePos()
+		{
+			Point screenPoint;
 
-            screenPoint.X = (mMouseState.Position.X - Game1.sRenderTargetRect.Location.X) / Game1.sRenderTargetRect.Width;
-            screenPoint.Y = (mMouseState.Position.Y - Game1.sRenderTargetRect.Location.Y) / Game1.sRenderTargetRect.Height;
+			screenPoint.X = (mMouseState.Position.X - Game1.sRenderTargetRect.Location.X) / Game1.sRenderTargetRect.Width;
+			screenPoint.Y = (mMouseState.Position.Y - Game1.sRenderTargetRect.Location.Y) / Game1.sRenderTargetRect.Height;
 
-            return screenPoint;
-        }
-    }
+			return screenPoint;
+		}
+	}
 }

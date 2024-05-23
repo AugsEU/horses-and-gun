@@ -1,334 +1,328 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
-using Nito.Collections;
+﻿using Nito.Collections;
+using System;
 
 namespace HorsesAndGun
 {
-    enum HorseOrderType
-    {
-        moveTile,
-        moveTrack,
-        none
-    }
+	enum HorseOrderType
+	{
+		moveTile,
+		moveTrack,
+		none
+	}
 
-    struct HorseOrder
-    {
-        public HorseOrder(HorseOrderType _type, int _moveAmount)
-        {
-            moveAmount = _moveAmount;
-            type = _type;
-            finished = false;
-        }
+	struct HorseOrder
+	{
+		public HorseOrder(HorseOrderType _type, int _moveAmount)
+		{
+			moveAmount = _moveAmount;
+			type = _type;
+			finished = false;
+		}
 
-        public int moveAmount;
-        public HorseOrderType type;
-        public bool finished;
-    }
+		public int moveAmount;
+		public HorseOrderType type;
+		public bool finished;
+	}
 
-    internal class Horse : Entity
-    {
-        //Position
-        int mTileIndex;
-        int mTrackIndex;
-        int mReservedTile;
-        int mReservedTrack;
-        
-        //Orders
-        Deque<HorseOrder> mOrderQueue;
-        HorseOrder mCurrentOrder;
+	internal class Horse : Entity
+	{
+		//Position
+		int mTileIndex;
+		int mTrackIndex;
+		int mReservedTile;
+		int mReservedTrack;
 
-        //Lerp data
-        Vector2 mDestinationPosition;
-        Vector2 mDeltaDraw;
+		//Orders
+		Deque<HorseOrder> mOrderQueue;
+		HorseOrder mCurrentOrder;
 
-        MonoTimer mMoveTimer;
-        double mMoveTotal;
+		//Lerp data
+		Vector2 mDestinationPosition;
+		Vector2 mDeltaDraw;
 
-        //Textures
-        Animator mIdleAnim;
-        Animator mRunAnim;
-        Animator mJumpUpAnim;
-        Animator mJumpDownAnim;
+		MonoTimer mMoveTimer;
+		double mMoveTotal;
 
-        //State
-        bool mAlive;
+		//Textures
+		Animator mIdleAnim;
+		Animator mRunAnim;
+		Animator mJumpUpAnim;
+		Animator mJumpDownAnim;
 
-        public Horse(Vector2 _pos, int _tileIndex, int _trackIndex) : base(_pos)
-        {
-            mIdleAnim = new Animator(Animator.PlayType.Loop);
-            mRunAnim = new Animator(Animator.PlayType.Loop);
-            mJumpUpAnim = new Animator(Animator.PlayType.OneShot);
-            mJumpDownAnim = new Animator(Animator.PlayType.OneShot);
+		//State
+		bool mAlive;
 
-            mOrderQueue = new Deque<HorseOrder>();
+		public Horse(Vector2 _pos, int _tileIndex, int _trackIndex) : base(_pos)
+		{
+			mIdleAnim = new Animator(Animator.PlayType.Loop);
+			mRunAnim = new Animator(Animator.PlayType.Loop);
+			mJumpUpAnim = new Animator(Animator.PlayType.OneShot);
+			mJumpDownAnim = new Animator(Animator.PlayType.OneShot);
 
-            mTileIndex = _tileIndex;
-            mTrackIndex = _trackIndex;
+			mOrderQueue = new Deque<HorseOrder>();
 
-            mDestinationPosition = Vector2.Zero;
-            mDeltaDraw = Vector2.Zero;
+			mTileIndex = _tileIndex;
+			mTrackIndex = _trackIndex;
 
-            mMoveTimer = new MonoTimer();
-            mMoveTotal = 0.0;
+			mDestinationPosition = Vector2.Zero;
+			mDeltaDraw = Vector2.Zero;
 
-            mAlive = true;
+			mMoveTimer = new MonoTimer();
+			mMoveTotal = 0.0;
 
-            ClearOrder();
-        }
+			mAlive = true;
 
-        public override void Kill()
-        {
-            mAlive = false;
-            base.Kill();
-        }
+			ClearOrder();
+		}
 
-        public bool IsAlive()
-        {
-            return mAlive;
-        }
+		public override void Kill()
+		{
+			mAlive = false;
+			base.Kill();
+		}
 
-        public Vector2 GetEffectivePos()
-        {
-            return mPosition + mDeltaDraw;
-        }
+		public bool IsAlive()
+		{
+			return mAlive;
+		}
 
-        public override void LoadContent(ContentManager content)
-        {
-            mTexture = content.Load<Texture2D>("Horse/horse-stand1");
+		public Vector2 GetEffectivePos()
+		{
+			return mPosition + mDeltaDraw;
+		}
 
-            mIdleAnim.LoadFrame(content, "Horse/horse-stand1", 0.5f);
-            mIdleAnim.LoadFrame(content, "Horse/horse-stand3", 0.5f);
-            mIdleAnim.LoadFrame(content, "Horse/horse-stand2", 0.5f);
-            mIdleAnim.LoadFrame(content, "Horse/horse-stand3", 0.5f);
-            mIdleAnim.Play();
+		public override void LoadContent(ContentManager content)
+		{
+			mTexture = content.Load<Texture2D>("Horse/horse-stand1");
 
-            const float RUN_ANIM_SPEED = 0.1f;
-            mRunAnim.LoadFrame(content, "Horse/horse_run_1", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_2", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_3", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_4", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_5", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_6", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_7", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_8", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_9", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_10", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_11", RUN_ANIM_SPEED);
-            mRunAnim.LoadFrame(content, "Horse/horse_run_12", RUN_ANIM_SPEED);
-            mRunAnim.Play();
+			mIdleAnim.LoadFrame(content, "Horse/horse-stand1", 0.5f);
+			mIdleAnim.LoadFrame(content, "Horse/horse-stand3", 0.5f);
+			mIdleAnim.LoadFrame(content, "Horse/horse-stand2", 0.5f);
+			mIdleAnim.LoadFrame(content, "Horse/horse-stand3", 0.5f);
+			mIdleAnim.Play();
 
-            const float JUMP_ANIM_SPEED = 0.075f;
-            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_1", JUMP_ANIM_SPEED);
-            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_2", JUMP_ANIM_SPEED);
-            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_3", JUMP_ANIM_SPEED);
-            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_4", JUMP_ANIM_SPEED);
-            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_5", JUMP_ANIM_SPEED);
-            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_6", JUMP_ANIM_SPEED);
-            mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_7", JUMP_ANIM_SPEED);
+			const float RUN_ANIM_SPEED = 0.1f;
+			mRunAnim.LoadFrame(content, "Horse/horse_run_1", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_2", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_3", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_4", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_5", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_6", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_7", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_8", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_9", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_10", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_11", RUN_ANIM_SPEED);
+			mRunAnim.LoadFrame(content, "Horse/horse_run_12", RUN_ANIM_SPEED);
+			mRunAnim.Play();
 
-            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_7", RUN_ANIM_SPEED);
-            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_8", RUN_ANIM_SPEED);
-            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_9", RUN_ANIM_SPEED);
-            mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_10", RUN_ANIM_SPEED);
-        }
+			const float JUMP_ANIM_SPEED = 0.075f;
+			mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_1", JUMP_ANIM_SPEED);
+			mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_2", JUMP_ANIM_SPEED);
+			mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_3", JUMP_ANIM_SPEED);
+			mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_4", JUMP_ANIM_SPEED);
+			mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_5", JUMP_ANIM_SPEED);
+			mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_6", JUMP_ANIM_SPEED);
+			mJumpUpAnim.LoadFrame(content, "Horse/horse_jump_7", JUMP_ANIM_SPEED);
 
-        public override Rect2f ColliderBounds()
-        {
-            Vector2 pos = GetEffectivePos();
-            return new Rect2f(pos, pos + new Vector2(mTexture.Width, mTexture.Height));
-        }
+			mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_7", RUN_ANIM_SPEED);
+			mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_8", RUN_ANIM_SPEED);
+			mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_9", RUN_ANIM_SPEED);
+			mJumpDownAnim.LoadFrame(content, "Horse/horse_jump_10", RUN_ANIM_SPEED);
+		}
 
-        public override void Draw(DrawInfo info)
-        {
-            Texture2D texture = mRunAnim.GetCurrentTexture();
+		public override Rect2f ColliderBounds()
+		{
+			Vector2 pos = GetEffectivePos();
+			return new Rect2f(pos, pos + new Vector2(mTexture.Width, mTexture.Height));
+		}
 
-            if(mCurrentOrder.type == HorseOrderType.moveTrack)
-            {
-                if(mCurrentOrder.moveAmount < 0)
-                {
-                    texture = mJumpUpAnim.GetCurrentTexture();
-                }
-                else
-                {
-                    texture = mJumpDownAnim.GetCurrentTexture();
-                }
-                
-            }
+		public override void Draw(DrawInfo info)
+		{
+			Texture2D texture = mRunAnim.GetCurrentTexture();
 
-            info.spriteBatch.Draw(texture, GetEffectivePos(), Color.White);
+			if (mCurrentOrder.type == HorseOrderType.moveTrack)
+			{
+				if (mCurrentOrder.moveAmount < 0)
+				{
+					texture = mJumpUpAnim.GetCurrentTexture();
+				}
+				else
+				{
+					texture = mJumpDownAnim.GetCurrentTexture();
+				}
 
-        }
+			}
 
-        public void ShiftHorseBack()
-        {
-            mTileIndex--;
-            mReservedTile--;
-        }
+			info.spriteBatch.Draw(texture, GetEffectivePos(), Color.White);
 
-        public void SetDestPosition(Vector2 dest)
-        {
-            mDestinationPosition = dest;
-        }
+		}
 
-        public override void Update(GameTime gameTime)
-        {
-            mJumpUpAnim.Update(gameTime);
-            mJumpDownAnim.Update(gameTime);
-            mIdleAnim.Update(gameTime);
-            mRunAnim.Update(gameTime);
+		public void ShiftHorseBack()
+		{
+			mTileIndex--;
+			mReservedTile--;
+		}
 
-            UpdateCurrentOrder(gameTime);
-        }
+		public void SetDestPosition(Vector2 dest)
+		{
+			mDestinationPosition = dest;
+		}
 
-        private void UpdateCurrentOrder(GameTime gameTime)
-        {
-            if(mCurrentOrder.type != HorseOrderType.none)
-            {
-                float lerpVal = (float)(mMoveTimer.GetElapsedMs() / mMoveTotal);
+		public override void Update(GameTime gameTime)
+		{
+			mJumpUpAnim.Update(gameTime);
+			mJumpDownAnim.Update(gameTime);
+			mIdleAnim.Update(gameTime);
+			mRunAnim.Update(gameTime);
 
-                if(lerpVal < 1.0)
-                {
-                    if (mCurrentOrder.type == HorseOrderType.moveTrack)
-                    {
-                        mDeltaDraw = Util.SmoothLerpVec(Vector2.Zero, mDestinationPosition - mPosition, lerpVal);
-                    }
-                    else
-                    {
-                        mDeltaDraw = Util.LerpVec(Vector2.Zero, mDestinationPosition - mPosition, lerpVal);
-                    }
-                }
-                else
-                {
-                    mCurrentOrder.finished = true;
-                }
-            }
-        }
+			UpdateCurrentOrder(gameTime);
+		}
 
-        public override void CollideWithEntity(Entity entity)
-        {
-            if(entity is MovingDie)
-            {
-                MovingDie movingDie = (MovingDie)entity;
+		private void UpdateCurrentOrder(GameTime gameTime)
+		{
+			if (mCurrentOrder.type != HorseOrderType.none)
+			{
+				float lerpVal = (float)(mMoveTimer.GetElapsedMs() / mMoveTotal);
 
-                if (movingDie.GetEnabled())
-                {
-                    movingDie.Kill();
+				if (lerpVal < 1.0)
+				{
+					if (mCurrentOrder.type == HorseOrderType.moveTrack)
+					{
+						mDeltaDraw = Util.SmoothLerpVec(Vector2.Zero, mDestinationPosition - mPosition, lerpVal);
+					}
+					else
+					{
+						mDeltaDraw = Util.LerpVec(Vector2.Zero, mDestinationPosition - mPosition, lerpVal);
+					}
+				}
+				else
+				{
+					mCurrentOrder.finished = true;
+				}
+			}
+		}
 
-                    QueueOrder(HorseOrderType.moveTile, movingDie.GetDice().Value);
-                }
-            }
-        }
+		public override void CollideWithEntity(Entity entity)
+		{
+			if (entity is MovingDie)
+			{
+				MovingDie movingDie = (MovingDie)entity;
 
-        public void QueueOrder(HorseOrderType _type, int _amount)
-        {
-            QueueOrder(new HorseOrder(_type, _amount));
-        }
+				if (movingDie.GetEnabled())
+				{
+					movingDie.Kill();
 
-        public void QueueOrder(HorseOrder order)
-        {
-            mOrderQueue.AddToBack(order);
-        }
+					QueueOrder(HorseOrderType.moveTile, movingDie.GetDice().Value);
+				}
+			}
+		}
 
-        public void QueueOrderFront(HorseOrderType _type, int _amount)
-        {
-            mOrderQueue.AddToFront(new HorseOrder(_type, _amount));
-        }
+		public void QueueOrder(HorseOrderType _type, int _amount)
+		{
+			QueueOrder(new HorseOrder(_type, _amount));
+		}
 
-        public void QueueOrderFront(HorseOrder order)
-        {
-            mOrderQueue.AddToFront(order);
-        }
+		public void QueueOrder(HorseOrder order)
+		{
+			mOrderQueue.AddToBack(order);
+		}
 
-        public HorseOrder PopTopOrder()
-        {
-            return mOrderQueue.RemoveFromFront();
-        }
+		public void QueueOrderFront(HorseOrderType _type, int _amount)
+		{
+			mOrderQueue.AddToFront(new HorseOrder(_type, _amount));
+		}
 
-        public void ExecuteOrder(HorseOrder order, Point finalPos)
-        {
-            if(mCurrentOrder.type == HorseOrderType.none)
-            {
-                mCurrentOrder = order;
-                mCurrentOrder.finished = false;
+		public void QueueOrderFront(HorseOrder order)
+		{
+			mOrderQueue.AddToFront(order);
+		}
 
-                mMoveTotal = OrderTime(mCurrentOrder);
-                mMoveTimer.FullReset();
-                mMoveTimer.Start();
+		public HorseOrder PopTopOrder()
+		{
+			return mOrderQueue.RemoveFromFront();
+		}
 
-                mJumpUpAnim.Play();
-                mJumpDownAnim.Play();
-            }
-        }
+		public void ExecuteOrder(HorseOrder order, Point finalPos)
+		{
+			if (mCurrentOrder.type == HorseOrderType.none)
+			{
+				mCurrentOrder = order;
+				mCurrentOrder.finished = false;
 
-        private double OrderTime(HorseOrder order)
-        {
-            if (order.type == HorseOrderType.moveTile)
-            {
-                return Math.Abs(order.moveAmount) * 600.0;
-            }
-            else
-            {
-                return Math.Abs(order.moveAmount) * 600.0;
-            }
-        }
+				mMoveTotal = OrderTime(mCurrentOrder);
+				mMoveTimer.FullReset();
+				mMoveTimer.Start();
 
-        public bool ReadyToMove()
-        {
-            return mOrderQueue.Count != 0 && mCurrentOrder.type == HorseOrderType.none;
-        }
+				mJumpUpAnim.Play();
+				mJumpDownAnim.Play();
+			}
+		}
 
-        public bool FinishedMove()
-        {
-            return mCurrentOrder.type != HorseOrderType.none && mCurrentOrder.finished == true;
-        }
+		private double OrderTime(HorseOrder order)
+		{
+			if (order.type == HorseOrderType.moveTile)
+			{
+				return Math.Abs(order.moveAmount) * 600.0;
+			}
+			else
+			{
+				return Math.Abs(order.moveAmount) * 600.0;
+			}
+		}
 
-        public void FinishOrder()
-        {
-            mTileIndex = mReservedTile;
-            mTrackIndex = mReservedTrack;
-            mDeltaDraw = Vector2.Zero;
+		public bool ReadyToMove()
+		{
+			return mOrderQueue.Count != 0 && mCurrentOrder.type == HorseOrderType.none;
+		}
 
-            ClearOrder();
-        }
+		public bool FinishedMove()
+		{
+			return mCurrentOrder.type != HorseOrderType.none && mCurrentOrder.finished == true;
+		}
 
-        public void ClearOrder()
-        {
-            mCurrentOrder = new HorseOrder(HorseOrderType.none, 0);
-            mReservedTile = mTileIndex;
-            mReservedTrack = mTrackIndex;
-        }
+		public void FinishOrder()
+		{
+			mTileIndex = mReservedTile;
+			mTrackIndex = mReservedTrack;
+			mDeltaDraw = Vector2.Zero;
 
-        public Point GetReservedPoint()
-        {
-            return new Point(mReservedTile, mReservedTrack);
-        }
+			ClearOrder();
+		}
 
-        public void ReserveTile(Point toReserve)
-        {
-            mReservedTile = toReserve.X;
-            mReservedTrack = toReserve.Y;
-        }
+		public void ClearOrder()
+		{
+			mCurrentOrder = new HorseOrder(HorseOrderType.none, 0);
+			mReservedTile = mTileIndex;
+			mReservedTrack = mTrackIndex;
+		}
 
-        public Point GetCurrentPoint()
-        {
-            return new Point(mTileIndex, mTrackIndex);
-        }
+		public Point GetReservedPoint()
+		{
+			return new Point(mReservedTile, mReservedTrack);
+		}
 
-        public int TrackIndex
-        {
-            get { return mTrackIndex; }
-            set { mTrackIndex = value; }
-        }
+		public void ReserveTile(Point toReserve)
+		{
+			mReservedTile = toReserve.X;
+			mReservedTrack = toReserve.Y;
+		}
 
-        public int TileIndex
-        {
-            set { mTileIndex = value; }
-            get { return mTileIndex; }
-        }
-    }
+		public Point GetCurrentPoint()
+		{
+			return new Point(mTileIndex, mTrackIndex);
+		}
+
+		public int TrackIndex
+		{
+			get { return mTrackIndex; }
+			set { mTrackIndex = value; }
+		}
+
+		public int TileIndex
+		{
+			set { mTileIndex = value; }
+			get { return mTileIndex; }
+		}
+	}
 }

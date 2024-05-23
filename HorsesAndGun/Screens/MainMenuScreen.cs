@@ -1,67 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
-
-namespace HorsesAndGun
+﻿namespace HorsesAndGun
 {
-    internal class MainMenuScreen : Screen
-    {
-        public MainMenuScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
-        {
+	internal class MainMenuScreen : Screen
+	{
+		public MainMenuScreen(ContentManager content, GraphicsDeviceManager graphics) : base(content, graphics)
+		{
 
-        }
+		}
 
-        public override void LoadContent(ContentManager content)
-        {
+		public override void LoadContent(ContentManager content)
+		{
 
-        }
+		}
 
-        public override void OnActivate()
-        {
+		public override void OnActivate()
+		{
 
-        }
+		}
 
-        public override void OnDeactivate()
-        {
+		public override void OnDeactivate()
+		{
 
-        }
+		}
 
-        public override RenderTarget2D DrawToRenderTarget(DrawInfo info)
-        {
-            SpriteFont pixelFont = FontManager.I.GetFont("Pixica-24");
+		public override RenderTarget2D DrawToRenderTarget(DrawInfo info)
+		{
+			SpriteFont pixelFont = FontManager.I.GetFont("Pixica-24");
 
-            Vector2 centre = new Vector2(mScreenTarget.Width / 2, mScreenTarget.Height / 2);
+			Vector2 centre = new Vector2(mScreenTarget.Width / 2, mScreenTarget.Height / 2);
 
-            //Draw out the game area
-            info.device.SetRenderTarget(mScreenTarget);
-            info.device.Clear(Color.SaddleBrown);
+			//Draw out the game area
+			info.device.SetRenderTarget(mScreenTarget);
+			info.device.Clear(Color.SaddleBrown);
 
-            info.spriteBatch.Begin(SpriteSortMode.Immediate,
-                                    BlendState.AlphaBlend,
-                                    SamplerState.PointClamp,
-                                    DepthStencilState.None,
-                                    RasterizerState.CullNone);
+			info.spriteBatch.Begin(SpriteSortMode.Immediate,
+									BlendState.AlphaBlend,
+									SamplerState.PointClamp,
+									DepthStencilState.None,
+									RasterizerState.CullNone);
 
-            Color color = Color.White;
+			Color color = Color.White;
 
-            info.spriteBatch.DrawString(pixelFont, "Horses & Gun.", new Vector2(30.0f, 40.0f), color);
-            info.spriteBatch.DrawString(pixelFont, "Press enter to play.", new Vector2(30.0f, 290.0f), color);
+			info.spriteBatch.DrawString(pixelFont, "Horses & Gun.", new Vector2(30.0f, 40.0f), color);
+			info.spriteBatch.DrawString(pixelFont, "Press enter to play.", new Vector2(30.0f, 290.0f), color);
 
-            info.spriteBatch.End();
+			info.spriteBatch.End();
 
-            return mScreenTarget;
-        }
+			return mScreenTarget;
+		}
 
-        public override void Update(GameTime gameTime)
-        {
-            if (InputManager.I.KeyPressed(Keys.Enter) || InputManager.I.LClick())
-            {
-                ScreenManager.I.ActivateScreen(ScreenType.MainGame);
-            }
-        }
-    }
+		public override void Update(GameTime gameTime)
+		{
+			if (InputManager.I.KeyPressed(Keys.Enter) || InputManager.I.LClick())
+			{
+				ScreenManager.I.ActivateScreen(ScreenType.MainGame);
+			}
+		}
+	}
 }
