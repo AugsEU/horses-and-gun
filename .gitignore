@@ -3,3 +3,6 @@ obj
 /HorsesAndGun/Content/bin
 /HorsesAndGun/Content/obj
 /HorsesAndGun/Content/Music/Horses and gun.wav
+/HorsesAndGun/Properties/
+/.vs/
+/HorsesAndGun/HorsesAndGun.csproj.user
